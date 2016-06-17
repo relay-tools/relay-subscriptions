@@ -1,0 +1,45 @@
+{
+  "name": "relay-subscriptions",
+  "version": "0.1.0",
+  "description": "Realtime utils for Relay",
+  "main": "lib/index.js",
+  "scripts": {
+    "watch": "babel src --out-dir lib --watch",
+    "build": "babel src --out-dir lib",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edvinerikson/relay-subscriptions.git"
+  },
+  "keywords": [
+    "Relay",
+    "react",
+    "subscriptions"
+  ],
+  "author": "Edvin Eriksson <edvinerikson@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/edvinerikson/relay-subscriptions/issues"
+  },
+  "homepage": "https://github.com/edvinerikson/relay-subscriptions#readme",
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-eslint": "^6.0.4",
+    "babel-plugin-syntax-trailing-function-commas": "^6.8.0",
+    "babel-plugin-transform-class-properties": "^6.9.1",
+    "babel-plugin-transform-export-extensions": "^6.8.0",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "eslint": "^2.12.0",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.8.1"
+  },
+  "dependencies": {
+    "base62": "^1.1.1",
+    "invariant": "^2.2.1",
+    "warning": "^3.0.0"
+  }
+}
