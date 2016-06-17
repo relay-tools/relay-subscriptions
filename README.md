@@ -11,13 +11,14 @@ The easiest way to get started is to check the example code in this repo. Please
 ### Installing
 `npm i --save relay-subscriptions`
 
+`SubscriptionProvider` is like RootContainer in Relay, it is handling store updates and subscriptions.  
+`SubscriptionContainer` is like `Relay.createContainer`, it provides `this.props.subscriptions.subscribe` to components.
 
 
 Things to do  
 * [ ] Figure out how this actually works.
 * [ ] Writing tests
 * [ ] Writing documentation
+* [ ] Cleanup
 
-
-`SubscriptionProvider` is like a RootContainer in Relay, it is handling store updates and subscriptions.  
-`SubscriptionContainer` is like `Relay.createContainer`, it provides `this.props.subscriptions.subscribe` to components.
+![PoC](http://g.recordit.co/zZfGNmYJTr.gif)
