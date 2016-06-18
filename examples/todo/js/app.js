@@ -28,25 +28,25 @@ import useRelay from 'react-router-relay';
 import Root from './components/Root';
 
 ReactDOM.render(
+  <Root>
     <Router
       environment={Relay.Store}
       history={history}
       render={applyRouterMiddleware(useRelay)}>
-      <Route component={Root}>
-        <Route path="/"
-          component={TodoApp}
-          queries={ViewerQueries}>
-          <IndexRoute
-            component={TodoList}
-            queries={ViewerQueries}
-            prepareParams={() => ({ status: 'any' })}
-          />
-          <Route path=":status"
-            component={TodoList}
-            queries={ViewerQueries}
-          />
-        </Route>
+      <Route path="/"
+        component={TodoApp}
+        queries={ViewerQueries}>
+        <IndexRoute
+          component={TodoList}
+          queries={ViewerQueries}
+          prepareParams={() => ({ status: 'any' })}
+        />
+        <Route path=":status"
+          component={TodoList}
+          queries={ViewerQueries}
+        />
       </Route>
-    </Router>,
+    </Router>
+  </Root>,
   mountNode
 );

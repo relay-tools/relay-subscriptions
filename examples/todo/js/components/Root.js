@@ -1,7 +1,7 @@
-import { SubscriptionProvider } from 'relay-subscriptions';
-
 import React, { Component } from 'react';
+import Relay from 'react-relay';
 import io from 'socket.io-client';
+import { SubscriptionProvider } from 'relay-subscriptions';
 
 // most of this is implementation details. You can solve this however you want
 export default class Root extends Component {
@@ -64,7 +64,7 @@ export default class Root extends Component {
   }
   render() {
     return (
-      <SubscriptionProvider subscribe={this.subscribe}>
+      <SubscriptionProvider environment={Relay.Store} subscribe={this.subscribe}>
         {this.props.children}
       </SubscriptionProvider>
     );
