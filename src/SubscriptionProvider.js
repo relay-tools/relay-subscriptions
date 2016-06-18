@@ -1,4 +1,5 @@
 import { PropTypes, Component } from 'react';
+import invariant from 'invariant';
 import * as RelaySubscriptions from './';
 
 export default class SubscriptionProvider extends Component {
@@ -6,28 +7,35 @@ export default class SubscriptionProvider extends Component {
     subscriptions: PropTypes.object.isRequired,
   };
   static contextTypes = {
-    relay: PropTypes.object.isRequired,
+    relay: PropTypes.object,
   };
   static propTypes = {
     subscribe: PropTypes.func.isRequired,
+    environment: PropTypes.object,
   }
   getChildContext() {
     return { subscriptions: { subscribe: this._subscribe.bind(this) } };
   }
+  getEnvironment() {
+    const environment = this.props.environment || this.context.relay;
+    if (process.env.NODE_ENV !== 'production') {
+      invariant(
+        environment,
+        'SubscriptionProvider: RelayEnvironment could not be found. Please render ' +
+        'the SubscriptionProvider under a RootContainer or provide the `environment` prop'
+      );
+    }
+    return environment;
+  }
   _subscriptions = {};
-  componentDidMount() {
-
-  }
-  componentWillUnmount() {
-
-  }
   _subscribe(subscription, ...args) {
+    const environment = this.getEnvironment();
     const clientMutationId = Math.random().toString(36).substr(0, 9);
     let observable = args[args.length - 1];
     if (observable !== null || observable !== undefined && typeof observable !== 'object') {
       observable = {};
     }
-    subscription.bindEnvironment(this.context.relay);
+    subscription.bindEnvironment(environment);
     const input = {
       ...subscription.getVariables(),
       clientMutationId,
@@ -58,7 +66,8 @@ export default class SubscriptionProvider extends Component {
     };
   }
   updateStoreData(query, payload, configs) {
-    const storeData = this.context.relay.getStoreData();
+    const environment = this.getEnvironment();
+    const storeData = environment.getStoreData();
     const callName = query.getCall().name;
     storeData.handleUpdatePayload(query, payload[callName], { configs });
   }
