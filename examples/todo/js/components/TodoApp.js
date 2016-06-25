@@ -92,6 +92,8 @@ export default Relay.createContainer(RelaySubscriptions.createSubscriptionContai
         totalCount,
         ${AddTodoMutation.getFragment('viewer')},
         ${TodoListFooter.getFragment('viewer')},
+        ${AddTodoSubscription.getFragment('viewer')}
+        ${RemoveTodoSubscription.getFragment('viewer')}
       }
     `,
   },

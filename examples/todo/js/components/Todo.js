@@ -121,6 +121,7 @@ export default Relay.createContainer(RelaySubscriptions.createSubscriptionContai
         ${ChangeTodoStatusMutation.getFragment('todo')},
         ${RemoveTodoMutation.getFragment('todo')},
         ${RenameTodoMutation.getFragment('todo')},
+        ${UpdateTodoSubscription.getFragment('todo')}
       }
     `,
     viewer: () => Relay.QL`

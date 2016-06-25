@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+
 export default function SubscriptionContainerHOC(Component) {
   const SubscriptionContainer = (props, { subscriptions }) => (
     <Component

@@ -28,7 +28,7 @@ import useRelay from 'react-router-relay';
 import Root from './components/Root';
 
 ReactDOM.render(
-  <Root>
+  <Root environment={Relay.Store}>
     <Router
       environment={Relay.Store}
       history={history}

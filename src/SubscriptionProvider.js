@@ -12,6 +12,7 @@ export default class SubscriptionProvider extends Component {
   static propTypes = {
     subscribe: PropTypes.func.isRequired,
     environment: PropTypes.object,
+    children: PropTypes.element.isRequired,
   }
   getChildContext() {
     return { subscriptions: { subscribe: this._subscribe.bind(this) } };
@@ -67,9 +68,7 @@ export default class SubscriptionProvider extends Component {
   }
   updateStoreData(query, payload, configs) {
     const environment = this.getEnvironment();
-    const storeData = environment.getStoreData();
-    const callName = query.getCall().name;
-    storeData.handleUpdatePayload(query, payload[callName], { configs });
+    RelaySubscriptions.updateStoreData(environment, configs, query, payload);
   }
   render() {
     return this.props.children;

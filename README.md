@@ -6,14 +6,15 @@ This library helps you print the query and update the store for you.
 
 The easiest way to get started is to check the example code in this repo. Please note that server implementation isn't good and I haven't spent much time on it because that's the part which will be different for everyone.  
 
-`Todo.js` and `TodoApp.js` is the components that uses subscriptions and `Root.js` is the component that sends the subscriptions to the server.
+`Todo.js` and `TodoApp.js` is the components that uses subscriptions and `Root.js` is the component that sends the subscriptions to the server.  
+
+There are some initial [API docs](docs/API.md) too.
 
 ### Installing
 `npm i --save relay-subscriptions`
 
 `SubscriptionProvider` is like RootContainer in Relay, it is handling store updates and subscriptions.  
 `SubscriptionContainer` is like `Relay.createContainer`, it provides `this.props.subscriptions.subscribe` to components.
-
 
 Things to do  
 * [ ] Figure out how this actually works.

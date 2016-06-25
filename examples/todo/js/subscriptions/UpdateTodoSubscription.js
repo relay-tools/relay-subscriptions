@@ -30,7 +30,7 @@ export default class UpdateTodoSubscription extends RelaySubscriptions.Subscript
   getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
-      fieldIds: {
+      fieldIDs: {
         todo: this.props.todo.id,
       },
     }];
