@@ -1,10 +1,13 @@
-import React, { Component } from 'react';
-import Relay from 'react-relay';
+import React, { Component, PropTypes } from 'react';
 import io from 'socket.io-client';
 import { SubscriptionProvider } from 'relay-subscriptions';
 
 // most of this is implementation details. You can solve this however you want
 export default class Root extends Component {
+  static propTypes = {
+    environment: PropTypes.object.isRequired,
+    children: PropTypes.element,
+  };
   _subscriptions = [];
   componentDidMount() {
     this._socket = io();
@@ -64,7 +67,10 @@ export default class Root extends Component {
   }
   render() {
     return (
-      <SubscriptionProvider environment={Relay.Store} subscribe={this.subscribe}>
+      <SubscriptionProvider
+        environment={this.props.environment}
+        subscribe={this.subscribe}
+      >
         {this.props.children}
       </SubscriptionProvider>
     );

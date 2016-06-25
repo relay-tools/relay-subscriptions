@@ -1,9 +1,13 @@
+/* @flow */
 import invariant from 'invariant';
-import printQuery from './printQuery';
-
-export type Subscription = {
-  dispose(): void;
-};
+import printQuery from 'react-relay/lib/printRelayQuery';
+import RelayQuery from 'react-relay/lib/RelayQuery';
+import type {
+  Subscription,
+  SubscriptionResult,
+  Variables,
+  PrintedQuery,
+} from './types';
 
 export default class SubscriptionRequest {
   _active: boolean;
@@ -45,7 +49,7 @@ export default class SubscriptionRequest {
   subscribe(observer: Function): Subscription {
     invariant(
       this._active,
-      'SubscriptionRequest: Cannot subscripe to disposed subscription.'
+      'SubscriptionRequest: Cannot subscribe to disposed subscription.'
     );
 
     const observerIndex = this._observers.length;
