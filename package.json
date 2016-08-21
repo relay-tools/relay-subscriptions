@@ -4,10 +4,12 @@
   "description": "Realtime utils for Relay",
   "main": "lib/index.js",
   "scripts": {
-    "watch": "babel src --ignore *-test.js --out-dir lib --watch",
-    "build": "babel src --ignore *-test.js --out-dir lib/",
-    "test": "jest",
-    "lint": "eslint src/",
+    "build": "rimraf lib && babel src --ignore __tests__ --out-dir lib",
+    "watch": "npm run build -- --watch",
+    "test": "npm run lint && npm run check && npm run testonly",
+    "lint": "eslint src",
+    "check": "flow check src",
+    "testonly": "jest",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -47,11 +49,13 @@
     "eslint-plugin-import": "^1.8.1",
     "eslint-plugin-jsx-a11y": "^1.5.3",
     "eslint-plugin-react": "^5.2.2",
+    "flow-bin": "^0.30.0",
     "jest-cli": "^13.0.0",
     "react": "^15.1.0",
     "react-addons-test-utils": "^15.1.0",
     "react-dom": "^15.1.0",
-    "react-relay": "^0.9.1"
+    "react-relay": "^0.9.1",
+    "rimraf": "^2.5.4"
   },
   "peerDependencies": {
     "react-relay": "^0.9.1",
