@@ -17,12 +17,10 @@
     "url": "git+https://github.com/edvinerikson/relay-subscriptions.git"
   },
   "files": [
-    "lib",
-    "LICENSE",
-    "README.md"
+    "lib"
   ],
   "keywords": [
-    "Relay",
+    "relay",
     "react",
     "subscriptions"
   ],
