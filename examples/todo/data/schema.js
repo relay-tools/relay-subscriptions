@@ -267,9 +267,9 @@ const GraphQLRenameTodoMutation = mutationWithClientMutationId({
 const GraphQLAddTodoSubscription = new GraphQLObjectType({
   name: 'AddTodoSubscription',
   fields: {
-    clientMutationId: {
+    clientSubscriptionId: {
       type: GraphQLID,
-      resolve: ({ clientMutationId }) => clientMutationId,
+      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
     },
     todo: {
       type: GraphQLTodo,
@@ -296,9 +296,9 @@ const GraphQLAddTodoSubscription = new GraphQLObjectType({
 const GraphQLRemoveTodoSubscription = new GraphQLObjectType({
   name: 'RemoveTodoSubscription',
   fields: {
-    clientMutationId: {
+    clientSubscriptionId: {
       type: GraphQLID,
-      resolve: ({ clientMutationId }) => clientMutationId,
+      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
     },
     deletedTodoId: {
       type: GraphQLID,
@@ -314,9 +314,9 @@ const GraphQLRemoveTodoSubscription = new GraphQLObjectType({
 const GraphQLUpdateTodoSubscription = new GraphQLObjectType({
   name: 'UpdateTodoSubscription',
   fields: {
-    clientMutationId: {
+    clientSubscriptionId: {
       type: GraphQLID,
-      resolve: ({ clientMutationId }) => clientMutationId,
+      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
     },
     todo: {
       type: GraphQLTodo,
@@ -344,7 +344,7 @@ const Mutation = new GraphQLObjectType({
 const SubscriptionInput = new GraphQLInputObjectType({
   name: 'TodoSubscriptionInput',
   fields: {
-    clientMutationId: { type: GraphQLID },
+    clientSubscriptionId: { type: GraphQLID },
   },
 });
 
@@ -358,7 +358,7 @@ const Subscription = new GraphQLObjectType({
           type: SubscriptionInput,
         },
       },
-      resolve: (_, { input: { clientMutationId } }, { data }) => ({ clientMutationId, data }),
+      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({ clientSubscriptionId, data }),
     },
     removeTodoSubscription: {
       type: GraphQLRemoveTodoSubscription,
@@ -367,7 +367,7 @@ const Subscription = new GraphQLObjectType({
           type: SubscriptionInput,
         }
       },
-      resolve: (_, { input: { clientMutationId } }, { data }) => ({ clientMutationId, data }),
+      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({ clientSubscriptionId, data }),
     },
     updateTodoSubscription: {
       type: GraphQLUpdateTodoSubscription,
@@ -376,8 +376,8 @@ const Subscription = new GraphQLObjectType({
           type: SubscriptionInput,
         }
       },
-      resolve: (_, { input: { clientMutationId } }, { data }) => ({
-        clientMutationId,
+      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({
+        clientSubscriptionId,
         data,
       }),
     }
