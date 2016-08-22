@@ -10,8 +10,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { toGlobalId } from 'graphql-relay';
-
 export class Todo {}
 export class User {}
 
@@ -34,18 +32,22 @@ const todoIdsByUser = {
 const notifiers = [];
 
 function notifyChange(topic, data) {
-  notifiers.forEach(notifier => notifier({ topic, data }));
+  // Delay the change notification to avoid the subscription update hitting the
+  // client before the mutation response.
+  setTimeout(() => {
+    notifiers.forEach(notifier => notifier({ topic, data }));
+  }, 100);
 }
 
 export function addNotifier(cb) {
   notifiers.push(cb);
-}
 
-export function removeNotifier(cb) {
-  const index = notifiers.indexOf(cb);
-  if (index !== -1) {
-    notifiers.splice(index, 1);
-  }
+  return () => {
+    const index = notifiers.indexOf(cb);
+    if (index !== -1) {
+      notifiers.splice(index, 1);
+    }
+  };
 }
 
 let nextTodoId = 0;
@@ -57,7 +59,7 @@ export function addTodo(text, complete) {
   todo.text = text;
   todosById[todo.id] = todo;
   todoIdsByUser[VIEWER_ID].push(todo.id);
-  notifyChange('add_todo', { id: todo.id });
+  notifyChange('add_todo', todo);
   return todo.id;
 }
 
@@ -79,7 +81,7 @@ export function getTodos(status = 'any') {
 export function changeTodoStatus(id, complete) {
   const todo = getTodo(id);
   todo.complete = complete;
-  notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
+  notifyChange(`update_todo_${id}`, todo);
 }
 
 export function getUser(id) {
@@ -96,7 +98,7 @@ export function markAllTodos(complete) {
     if (todo.complete !== complete) {
       todo.complete = complete; // eslint-disable-line no-param-reassign
       changedTodos.push(todo);
-      notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
+      notifyChange(`update_todo_${todo.id}`, todo);
     }
   });
   return changedTodos.map(todo => todo.id);
@@ -120,5 +122,5 @@ export function removeCompletedTodos() {
 export function renameTodo(id, text) {
   const todo = getTodo(id);
   todo.text = text;
-  notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
+  notifyChange(`update_todo_${id}`, todo);
 }

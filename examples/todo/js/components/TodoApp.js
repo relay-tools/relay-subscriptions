@@ -31,12 +31,10 @@ class TodoApp extends React.Component {
   componentDidMount() {
     const subscribe = this.props.subscriptions.subscribe;
     this._addSubscription = subscribe(
-      new AddTodoSubscription({ viewer: this.props.viewer }),
-      'add_todo'
+      new AddTodoSubscription({ viewer: this.props.viewer })
     );
     this._removeSubscription = subscribe(
-      new RemoveTodoSubscription({ viewer: this.props.viewer }),
-      'delete_todo'
+      new RemoveTodoSubscription({ viewer: this.props.viewer })
     );
   }
 
@@ -100,9 +98,9 @@ export default Relay.createContainer(RelaySubscriptions.createSubscriptionContai
   fragments: {
     viewer: () => Relay.QL`
       fragment on User {
-        totalCount,
-        ${AddTodoMutation.getFragment('viewer')},
-        ${TodoListFooter.getFragment('viewer')},
+        totalCount
+        ${AddTodoMutation.getFragment('viewer')}
+        ${TodoListFooter.getFragment('viewer')}
         ${AddTodoSubscription.getFragment('viewer')}
         ${RemoveTodoSubscription.getFragment('viewer')}
       }

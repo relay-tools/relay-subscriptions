@@ -16,24 +16,24 @@ export default class AddTodoMutation extends Relay.Mutation {
   static fragments = {
     viewer: () => Relay.QL`
       fragment on User {
-        id,
-        totalCount,
+        id
+        totalCount
       }
     `,
   };
 
   getMutation() {
-    return Relay.QL`mutation{ addTodo }`;
+    return Relay.QL`mutation { addTodo }`;
   }
 
   getFatQuery() {
     return Relay.QL`
       fragment on AddTodoPayload @relay(pattern: true) {
-        todoEdge,
+        todoEdge
         viewer {
-          todos,
-          totalCount,
-        },
+          todos
+          totalCount
+        }
       }
     `;
   }

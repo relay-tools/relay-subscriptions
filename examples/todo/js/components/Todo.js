@@ -34,10 +34,11 @@ class Todo extends React.Component {
   };
 
   componentDidMount() {
-    this._updateSubscription = this.props.subscriptions.subscribe(
-      new UpdateTodoSubscription({ todo: this.props.todo }),
-      `update_todo_${this.props.todo.id}`
-    );
+    if (!this.props.relay.hasOptimisticUpdate(this.props.todo)) {
+      this._updateSubscription = this.props.subscriptions.subscribe(
+        new UpdateTodoSubscription({ todo: this.props.todo })
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -135,19 +136,19 @@ export default Relay.createContainer(RelaySubscriptions.createSubscriptionContai
   fragments: {
     todo: () => Relay.QL`
       fragment on Todo {
-        complete,
-        id,
-        text,
-        ${ChangeTodoStatusMutation.getFragment('todo')},
-        ${RemoveTodoMutation.getFragment('todo')},
-        ${RenameTodoMutation.getFragment('todo')},
+        id
+        complete
+        text
+        ${ChangeTodoStatusMutation.getFragment('todo')}
+        ${RemoveTodoMutation.getFragment('todo')}
+        ${RenameTodoMutation.getFragment('todo')}
         ${UpdateTodoSubscription.getFragment('todo')}
       }
     `,
     viewer: () => Relay.QL`
       fragment on User {
-        ${ChangeTodoStatusMutation.getFragment('viewer')},
-        ${RemoveTodoMutation.getFragment('viewer')},
+        ${ChangeTodoStatusMutation.getFragment('viewer')}
+        ${RemoveTodoMutation.getFragment('viewer')}
       }
     `,
   },

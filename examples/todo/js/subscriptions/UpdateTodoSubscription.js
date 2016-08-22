@@ -4,28 +4,36 @@ import * as RelaySubscriptions from 'relay-subscriptions';
 export default class UpdateTodoSubscription extends RelaySubscriptions.Subscription {
   static fragments = {
     todo: () => Relay.QL`
-    fragment on Todo {
-      id
-    }`,
+      fragment on Todo {
+        id
+      }
+    `,
   };
+
   getSubscription() {
-    return Relay.QL`subscription {
-      updateTodoSubscription {
-        todo {
-          id
-          text
-          complete
-        }
-        viewer {
-          id
-          completedCount
+    return Relay.QL`
+      subscription {
+        updateTodoSubscription(input: $input) {
+          todo {
+            id
+            text
+            complete
+          }
+          viewer {
+            id
+            completedCount
+          }
         }
       }
-    }`;
+    `;
   }
+
   getVariables() {
-    return {};
+    return {
+      id: this.props.todo.id,
+    };
   }
+
   getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
