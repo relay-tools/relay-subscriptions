@@ -81,13 +81,13 @@ export default class SubscriptionRequest {
     }
   }
 
-  setDisposable(dispoable: Subscription): void {
+  setDisposable(disposable: Subscription): void {
     invariant(
       !this._disposable,
-      'SubscriptionRequest: attempting to set dispoable more than once'
+      'SubscriptionRequest: attempting to set disposable more than once'
     );
 
-    this._disposable = dispoable;
+    this._disposable = disposable;
 
     if (this._disposed) {
       this._disposable.dispose();
@@ -135,5 +135,9 @@ export default class SubscriptionRequest {
 
   getSubscription(): RelayQuery.Subscription {
     return this._subscription;
+  }
+
+  getClientSubscriptionId(): string {
+    return this.getSubscription().getVariables().input.clientSubscriptionId;
   }
 }

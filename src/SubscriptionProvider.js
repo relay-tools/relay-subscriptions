@@ -1,54 +1,74 @@
-import { PropTypes, Component } from 'react';
 import invariant from 'invariant';
-import * as RelaySubscriptions from './';
+import { PropTypes, Component } from 'react';
+
+import createQuerySubscription from './createQuerySubscription';
+import SubscriptionRequest from './SubscriptionRequest';
+import updateStoreData from './updateStoreData';
 
 export default class SubscriptionProvider extends Component {
-  static childContextTypes = {
-    subscriptions: PropTypes.object.isRequired,
-  };
-  static contextTypes = {
-    relay: PropTypes.object,
-  };
   static propTypes = {
     subscribe: PropTypes.func.isRequired,
     environment: PropTypes.object,
     children: PropTypes.element.isRequired,
-  }
+  };
+
+  static contextTypes = {
+    relay: PropTypes.object,
+  };
+
+  static childContextTypes = {
+    subscriptions: PropTypes.object.isRequired,
+  };
+
   getChildContext() {
-    return { subscriptions: { subscribe: this._subscribe.bind(this) } };
+    return {
+      subscriptions: {
+        subscribe: this._subscribe,
+      },
+    };
   }
+
   getEnvironment() {
     const environment = this.props.environment || this.context.relay;
     if (process.env.NODE_ENV !== 'production') {
       invariant(
         environment,
         'SubscriptionProvider: RelayEnvironment could not be found. Please render ' +
-        'the SubscriptionProvider under a RootContainer or provide the `environment` prop'
+        'the SubscriptionProvider under a RelayRenderer or provide the `environment` prop'
       );
     }
+
     return environment;
   }
-  _subscriptions = {};
-  _subscribe(subscription, ...args) {
-    const environment = this.getEnvironment();
-    const clientMutationId = Math.random().toString(36).substr(0, 9);
+
+  _nextId = 0;
+
+  _subscribe = (subscription, ...args) => {
     let observable = args[args.length - 1];
     if (observable !== null || observable !== undefined && typeof observable !== 'object') {
       observable = {};
     }
+
+    const clientSubscriptionId = this._nextId.toString(36);
+    ++this._nextId;
+
+    const environment = this.getEnvironment();
     subscription.bindEnvironment(environment);
+
     const input = {
       ...subscription.getVariables(),
-      clientMutationId,
+      clientSubscriptionId,
     };
-    const query = RelaySubscriptions.createQuerySubscription(
+
+    const query = createQuerySubscription(
       subscription.getSubscription(),
       { input }
     );
-    const subscriptionRequest = new RelaySubscriptions.SubscriptionRequest(query);
+
+    const subscriptionRequest = new SubscriptionRequest(query);
     subscriptionRequest.subscribe({
       onNext: payload => {
-        this.updateStoreData(query, payload, subscription.getConfigs.call(subscription));
+        updateStoreData(environment, subscription.getConfigs(), query, payload);
         if (observable.onNext) observable.onNext(payload);
       },
       onError: error => {
@@ -60,16 +80,14 @@ export default class SubscriptionProvider extends Component {
     });
 
     this.props.subscribe(subscriptionRequest, ...args);
+
     return {
       dispose: () => {
         subscriptionRequest.dispose();
       },
     };
-  }
-  updateStoreData(query, payload, configs) {
-    const environment = this.getEnvironment();
-    RelaySubscriptions.updateStoreData(environment, configs, query, payload);
-  }
+  };
+
   render() {
     return this.props.children;
   }

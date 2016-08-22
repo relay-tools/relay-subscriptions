@@ -11,7 +11,6 @@ export default class UpdateTodoSubscription extends RelaySubscriptions.Subscript
   getSubscription() {
     return Relay.QL`subscription {
       updateTodoSubscription {
-        clientMutationId
         todo {
           id
           text

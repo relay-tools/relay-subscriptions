@@ -25,6 +25,7 @@ export default class Subscription<Tp: Object> {
   _environment: RelayEnvironment;
   _didShowFakeDataWarning: boolean;
   _didValidateConfig: boolean;
+
   constructor(props: Tp) {
     this._didShowFakeDataWarning = false;
     this._didValidateConfig = false;
@@ -66,6 +67,7 @@ export default class Subscription<Tp: Object> {
       this.constructor.name
     );
   }
+
   _resolveProps(): void {
     RelayMutation.prototype._resolveProps.call(this);
   }

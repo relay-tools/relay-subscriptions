@@ -1,13 +1,14 @@
 jest.unmock('../SubscriptionContainer');
 
-import React from 'react';
 import { shallow } from 'enzyme';
+import React from 'react';
+
 import createSubscriptionContainer from '../SubscriptionContainer';
 
-
 describe('SubscriptionContainer', () => {
-  let Child = null;
-  let Container = null;
+  let Child;
+  let Container;
+
   beforeEach(() => {
     Child = () => <span />;
     Container = createSubscriptionContainer(Child);
@@ -19,7 +20,7 @@ describe('SubscriptionContainer', () => {
   });
 
   it('passes props to children', () => {
-    const wrapper = shallow(<Container foo="bar" />);
+    const wrapper = shallow(<Container foo="bar" />, { context: { subscriptions: {} } });
     expect(wrapper.find(Child).props().foo).toEqual('bar');
   });
 });

@@ -12,11 +12,8 @@ export default class AddTodoSubscription extends RelaySubscriptions.Subscription
   getSubscription() {
     return Relay.QL`subscription {
       addTodoSubscription {
-        clientMutationId
         todoEdge {
-          __typename
           node {
-            __typename
             id
             text
             complete

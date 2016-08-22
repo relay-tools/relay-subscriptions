@@ -11,7 +11,6 @@ export default class RemoveTodoSubscription extends RelaySubscriptions.Subscript
   getSubscription() {
     return Relay.QL`subscription {
       removeTodoSubscription {
-        clientMutationId
         deletedTodoId
         viewer {
           completedCount
