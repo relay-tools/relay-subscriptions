@@ -7,7 +7,7 @@
     "build": "rimraf lib && babel src --ignore __tests__ --out-dir lib",
     "watch": "npm run build -- --watch",
     "test": "npm run lint && npm run check && npm run testonly",
-    "lint": "eslint src",
+    "lint": "eslint examples src",
     "check": "flow check src",
     "testonly": "jest",
     "prepublish": "npm run build"

@@ -9,7 +9,9 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { toGlobalId } from 'graphql-relay';
+
+import { toGlobalId } from 'graphql-relay';
+
 export class Todo {}
 export class User {}
 
@@ -30,12 +32,9 @@ const todoIdsByUser = {
 };
 
 const notifiers = [];
-let nextTodoId = 0;
-addTodo('Taste JavaScript', true);
-addTodo('Buy a unicorn', false);
 
 function notifyChange(topic, data) {
-  notifiers.forEach(notifier => notifier({topic, data}));
+  notifiers.forEach(notifier => notifier({ topic, data }));
 }
 
 export function addNotifier(cb) {
@@ -49,6 +48,8 @@ export function removeNotifier(cb) {
   }
 }
 
+let nextTodoId = 0;
+
 export function addTodo(text, complete) {
   const todo = new Todo();
   todo.complete = !!complete;
@@ -60,11 +61,8 @@ export function addTodo(text, complete) {
   return todo.id;
 }
 
-export function changeTodoStatus(id, complete) {
-  const todo = getTodo(id);
-  todo.complete = complete;
-  notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
-}
+addTodo('Taste JavaScript', true);
+addTodo('Buy a unicorn', false);
 
 export function getTodo(id) {
   return todosById[id];
@@ -76,6 +74,12 @@ export function getTodos(status = 'any') {
     return todos;
   }
   return todos.filter(todo => todo.complete === (status === 'completed'));
+}
+
+export function changeTodoStatus(id, complete) {
+  const todo = getTodo(id);
+  todo.complete = complete;
+  notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
 }
 
 export function getUser(id) {
@@ -90,7 +94,7 @@ export function markAllTodos(complete) {
   const changedTodos = [];
   getTodos().forEach(todo => {
     if (todo.complete !== complete) {
-      todo.complete = complete;
+      todo.complete = complete; // eslint-disable-line no-param-reassign
       changedTodos.push(todo);
       notifyChange(`update_todo_${toGlobalId('Todo', todo.id)}`, { id: todo.id });
     }
@@ -103,7 +107,7 @@ export function removeTodo(id) {
   if (todoIndex !== -1) {
     todoIdsByUser[VIEWER_ID].splice(todoIndex, 1);
   }
-  notifyChange(`delete_todo`, { id });
+  notifyChange('delete_todo', { id });
   delete todosById[id];
 }
 

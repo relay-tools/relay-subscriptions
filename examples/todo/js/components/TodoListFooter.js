@@ -10,13 +10,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {IndexLink, Link} from 'react-router';
-import RemoveCompletedTodosMutation from '../mutations/RemoveCompletedTodosMutation';
-
 import React from 'react';
 import Relay from 'react-relay';
+import { IndexLink, Link } from 'react-router';
+
+import RemoveCompletedTodosMutation
+  from '../mutations/RemoveCompletedTodosMutation';
 
 class TodoListFooter extends React.Component {
+  static propTypes = {
+    viewer: React.PropTypes.object.isRequired,
+    relay: React.PropTypes.object.isRequired,
+  };
+
   _handleRemoveCompletedTodosClick = () => {
     this.props.relay.commitUpdate(
       new RemoveCompletedTodosMutation({
@@ -25,6 +31,7 @@ class TodoListFooter extends React.Component {
       })
     );
   };
+
   render() {
     const numCompletedTodos = this.props.viewer.completedCount;
     const numRemainingTodos = this.props.viewer.totalCount - numCompletedTodos;
@@ -47,7 +54,8 @@ class TodoListFooter extends React.Component {
         {numCompletedTodos > 0 &&
           <button
             className="clear-completed"
-            onClick={this._handleRemoveCompletedTodosClick}>
+            onClick={this._handleRemoveCompletedTodosClick}
+          >
             Clear completed
           </button>
         }

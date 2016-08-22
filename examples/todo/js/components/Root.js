@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
+
 import React, { Component, PropTypes } from 'react';
-import io from 'socket.io-client';
 import { SubscriptionProvider } from 'relay-subscriptions';
+import io from 'socket.io-client';
 
 // most of this is implementation details. You can solve this however you want
 export default class Root extends Component {
@@ -8,7 +10,7 @@ export default class Root extends Component {
     environment: PropTypes.object.isRequired,
     children: PropTypes.element,
   };
-  _subscriptions = [];
+
   componentDidMount() {
     this._socket = io();
     this._socket.on('connect', () => {
@@ -21,12 +23,16 @@ export default class Root extends Component {
       });
     });
   }
+
   componentWillUnmount() {
     this._socket.disconnect();
     this._subscriptions.forEach(subscriptionRequest => {
       subscriptionRequest.dispose();
     });
   }
+
+  _subscriptions = [];
+
   subscribe = (subscriptionRequest, topic) => {
     const clientId = Math.random().toString(36).substr(0, 9);
 
@@ -65,6 +71,7 @@ export default class Root extends Component {
       }
     });
   }
+
   render() {
     return (
       <SubscriptionProvider

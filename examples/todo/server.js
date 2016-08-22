@@ -10,6 +10,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* eslint-disable no-console */
+
 import express from 'express';
 import graphQLHTTP from 'express-graphql';
 import { graphql } from 'graphql';

@@ -10,22 +10,24 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import AddTodoMutation from '../mutations/AddTodoMutation';
-import TodoListFooter from './TodoListFooter';
-import TodoTextInput from './TodoTextInput';
-import * as RelaySubscriptions from 'relay-subscriptions';
-import AddTodoSubscription from '../subscriptions/AddTodoSubscription';
-import RemoveTodoSubscription from '../subscriptions/RemoveTodoSubscription';
-
-
 import React from 'react';
 import Relay from 'react-relay';
+import * as RelaySubscriptions from 'relay-subscriptions';
+
+import AddTodoMutation from '../mutations/AddTodoMutation';
+import AddTodoSubscription from '../subscriptions/AddTodoSubscription';
+import RemoveTodoSubscription from '../subscriptions/RemoveTodoSubscription';
+import TodoListFooter from './TodoListFooter';
+import TodoTextInput from './TodoTextInput';
+
 class TodoApp extends React.Component {
-  _handleTextInputSave = (text) => {
-    this.props.relay.commitUpdate(
-      new AddTodoMutation({ text, viewer: this.props.viewer })
-    );
+  static propTypes = {
+    viewer: React.PropTypes.object.isRequired,
+    relay: React.PropTypes.object.isRequired,
+    subscriptions: React.PropTypes.object.isRequired,
+    children: React.PropTypes.node.isRequired,
   };
+
   componentDidMount() {
     const subscribe = this.props.subscriptions.subscribe;
     this._addSubscription = subscribe(
@@ -37,12 +39,21 @@ class TodoApp extends React.Component {
       'delete_todo'
     );
   }
+
   componentWillUnmount() {
     if (this._addSubscription) this._addSubscription.dispose();
     if (this._removeSubscription) this._removeSubscription.dispose();
   }
+
+  _handleTextInputSave = (text) => {
+    this.props.relay.commitUpdate(
+      new AddTodoMutation({ text, viewer: this.props.viewer })
+    );
+  };
+
   render() {
     const hasTodos = this.props.viewer.totalCount > 0;
+
     return (
       <div>
         <section className="todoapp">
@@ -51,7 +62,7 @@ class TodoApp extends React.Component {
               todos
             </h1>
             <TodoTextInput
-              autoFocus={true}
+              autoFocus
               className="new-todo"
               onSave={this._handleTextInputSave}
               placeholder="What needs to be done?"
