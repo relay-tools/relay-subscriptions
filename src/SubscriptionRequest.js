@@ -5,7 +5,7 @@ import RelayQuery from 'react-relay/lib/RelayQuery';
 
 import type {
   PrintedQuery,
-  SubscriptionObserver,
+  SubscriptionRequestObserver,
   SubscriptionResult,
   Variables,
 } from './types';
@@ -13,11 +13,11 @@ import type {
 export default class SubscriptionRequest {
   _printedQuery: ?PrintedQuery;
   _subscription: RelayQuery.Subscription;
-  _observer: SubscriptionObserver;
+  _observer: SubscriptionRequestObserver;
 
   constructor(
     subscription: RelayQuery.Subscription,
-    observer: SubscriptionObserver,
+    observer: SubscriptionRequestObserver,
   ) {
     this._printedQuery = null;
     this._subscription = subscription;

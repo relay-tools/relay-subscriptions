@@ -73,23 +73,29 @@ export default class Environment extends Relay.Environment {
       updateStoreData(this, subscription.getConfigs(), query, payload);
     };
 
-    let subscriptionObserver;
+    let requestObserver;
     if (observer) {
-      const definedObserver = observer; // Placate flow.
-      subscriptionObserver = {
+      const definedObserver = observer; // Placate Flow.
+      requestObserver = {
         onNext: (payload) => {
           onPayload(payload);
-          definedObserver.onNext(payload);
+          if (definedObserver.onNext) {
+            definedObserver.onNext(payload);
+          }
         },
         onError: (error) => {
-          definedObserver.onError(error);
+          if (definedObserver.onError) {
+            definedObserver.onError(error);
+          }
         },
         onCompleted: (value) => {
-          definedObserver.onCompleted(value);
+          if (definedObserver.onCompleted) {
+            definedObserver.onCompleted(value);
+          }
         },
       };
     } else {
-      subscriptionObserver = {
+      requestObserver = {
         onNext: onPayload,
         onError: () => {},
         onCompleted: () => {},
@@ -97,7 +103,7 @@ export default class Environment extends Relay.Environment {
     }
 
     return this._storeData.getNetworkLayer().sendSubscription(
-      new SubscriptionRequest(query, subscriptionObserver),
+      new SubscriptionRequest(query, requestObserver),
     );
   }
 }
