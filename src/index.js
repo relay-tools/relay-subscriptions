@@ -1,9 +1,7 @@
-/* API */
-export { default as Subscription } from './Subscription';
-export { default as SubscriptionRequest } from './SubscriptionRequest';
-export { default as updateStoreData } from './updateStoreData';
-export { default as createQuerySubscription } from './createQuerySubscription';
+/* @flow */
 
-/* React API */
-export { default as SubscriptionProvider } from './SubscriptionProvider';
-export { default as createSubscriptionContainer } from './SubscriptionContainer';
+import createContainer from './createContainer';
+import Environment from './Environment';
+import Subscription from './Subscription';
+
+export default { createContainer, Environment, Subscription };

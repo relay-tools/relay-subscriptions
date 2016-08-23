@@ -1,11 +1,15 @@
 {
-  "parser": "babel-eslint",
   "extends": "airbnb",
   "env": {
     "jest": true,
     "jasmine": true
   },
+  "parser": "babel-eslint",
+  "plugins": [
+    "flowtype"
+  ],
   "rules": {
-    "no-underscore-dangle": 0
+    "no-underscore-dangle": 0,
+    "flowtype/define-flow-type": 2
   }
 }

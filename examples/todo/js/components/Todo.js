@@ -10,10 +10,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import classnames from 'classnames';
+import classNames from 'classnames';
 import React from 'react';
 import Relay from 'react-relay';
-import * as RelaySubscriptions from 'relay-subscriptions';
+import RelaySubscriptions from 'relay-subscriptions';
 
 import ChangeTodoStatusMutation from '../mutations/ChangeTodoStatusMutation';
 import RemoveTodoMutation from '../mutations/RemoveTodoMutation';
@@ -26,7 +26,6 @@ class Todo extends React.Component {
     viewer: React.PropTypes.object.isRequired,
     todo: React.PropTypes.object.isRequired,
     relay: React.PropTypes.object.isRequired,
-    subscriptions: React.PropTypes.object.isRequired,
   };
 
   state = {
@@ -34,25 +33,28 @@ class Todo extends React.Component {
   };
 
   componentDidMount() {
-    if (!this.props.relay.hasOptimisticUpdate(this.props.todo)) {
-      this._updateSubscription = this.props.subscriptions.subscribe(
-        new UpdateTodoSubscription({ todo: this.props.todo })
+    const { relay, todo } = this.props;
+    if (!relay.hasOptimisticUpdate(todo)) {
+      this._subscription = relay.subscribe(
+        new UpdateTodoSubscription({ todo }),
       );
     }
   }
 
   componentWillUnmount() {
-    if (this._updateSubscription) this._updateSubscription.dispose();
+    if (this._subscription) {
+      this._subscription.dispose();
+    }
   }
 
   _handleCompleteChange = (e) => {
-    const complete = e.target.checked;
-    this.props.relay.commitUpdate(
+    const { relay, todo, viewer } = this.props;
+    relay.commitUpdate(
       new ChangeTodoStatusMutation({
-        complete,
-        todo: this.props.todo,
-        viewer: this.props.viewer,
-      })
+        todo,
+        viewer,
+        complete: e.target.checked,
+      }),
     );
   };
 
@@ -75,14 +77,16 @@ class Todo extends React.Component {
 
   _handleTextInputSave = (text) => {
     this._setEditMode(false);
-    this.props.relay.commitUpdate(
-      new RenameTodoMutation({ todo: this.props.todo, text })
+    const { relay, todo } = this.props;
+    relay.commitUpdate(
+      new RenameTodoMutation({ todo, text }),
     );
   };
 
   _removeTodo() {
-    this.props.relay.commitUpdate(
-      new RemoveTodoMutation({ todo: this.props.todo, viewer: this.props.viewer })
+    const { relay, todo, viewer } = this.props;
+    relay.commitUpdate(
+      new RemoveTodoMutation({ todo, viewer }),
     );
   }
 
@@ -106,7 +110,7 @@ class Todo extends React.Component {
   render() {
     return (
       <li
-        className={classnames({
+        className={classNames({
           completed: this.props.todo.complete,
           editing: this.state.isEditing,
         })}
@@ -132,7 +136,7 @@ class Todo extends React.Component {
   }
 }
 
-export default Relay.createContainer(RelaySubscriptions.createSubscriptionContainer(Todo), {
+export default RelaySubscriptions.createContainer(Todo, {
   fragments: {
     todo: () => Relay.QL`
       fragment on Todo {

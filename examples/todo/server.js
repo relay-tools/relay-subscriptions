@@ -61,7 +61,7 @@ io.on('connection', socket => {
     });
   });
 
-  socket.on('new subscription', ({ id, query, variables }) => {
+  socket.on('subscribe', ({ id, query, variables }) => {
     function unsubscribe(topic, subscription) {
       const index = topics[topic].indexOf(subscription);
       if (index === -1) return;
@@ -104,7 +104,7 @@ io.on('connection', socket => {
     });
   });
 
-  socket.on('close subscription', (id) => {
+  socket.on('unsubscribe', (id) => {
     const unsubscribe = unsubscribeMap[id];
     if (!unsubscribe) return;
 
@@ -122,13 +122,16 @@ io.on('connection', socket => {
 // Serve the Relay app
 const compiler = webpack({
   devtool: 'sourcemap',
-  entry: path.resolve(__dirname, 'js', 'app.js'),
+  entry: [
+    'babel-polyfill',
+    path.join(__dirname, 'js', 'app.js'),
+  ],
   module: {
     loaders: [
       {
-        include: path.join(__dirname, 'js'),
-        loader: 'babel',
         test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel',
       },
     ],
   },
@@ -146,7 +149,7 @@ const app = new WebpackDevServer(compiler, {
 });
 
 // Serve static resources
-app.use('/', express.static(path.resolve(__dirname, 'public')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 app.listen(APP_PORT, () => {
   console.log(`App is now running on http://localhost:${APP_PORT}`);
 });

@@ -1,15 +1,13 @@
 /* @flow */
 
 import invariant from 'invariant';
+import Relay from 'react-relay';
 import RelayMetaRoute from 'react-relay/lib/RelayMetaRoute';
-import { Mutation as RelayMutation } from 'react-relay';
-
 
 import type {
-  RelayEnvironment,
-  Variables,
-  RelayConcreteNode,
   MutationConfig,
+  RelayConcreteNode,
+  Variables,
 } from './types';
 
 export default class Subscription<Tp: Object> {
@@ -22,7 +20,7 @@ export default class Subscription<Tp: Object> {
 
   props: Tp;
   _unresolvedProps: Tp;
-  _environment: RelayEnvironment;
+  _environment: Relay.Environment;
   _didShowFakeDataWarning: boolean;
   _didValidateConfig: boolean;
 
@@ -33,15 +31,15 @@ export default class Subscription<Tp: Object> {
   }
 
   static getFragment(fragmentName: string, variableMapping): any {
-    return RelayMutation.getFragment.call(
+    return Relay.Mutation.getFragment.call(
       this,
       fragmentName,
       variableMapping
     );
   }
 
-  bindEnvironment(environment: RelayEnvironment): void {
-    RelayMutation.prototype.bindEnvironment.call(this, environment);
+  bindEnvironment(environment: Relay.Environment): void {
+    Relay.Mutation.prototype.bindEnvironment.call(this, environment);
   }
 
   getSubscription(): RelayConcreteNode {
@@ -69,6 +67,6 @@ export default class Subscription<Tp: Object> {
   }
 
   _resolveProps(): void {
-    RelayMutation.prototype._resolveProps.call(this);
+    Relay.Mutation.prototype._resolveProps.call(this);
   }
 }

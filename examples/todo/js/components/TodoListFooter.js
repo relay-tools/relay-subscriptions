@@ -24,17 +24,20 @@ class TodoListFooter extends React.Component {
   };
 
   _handleRemoveCompletedTodosClick = () => {
-    this.props.relay.commitUpdate(
+    const { relay, viewer } = this.props;
+    relay.commitUpdate(
       new RemoveCompletedTodosMutation({
-        todos: this.props.viewer.todos,
-        viewer: this.props.viewer,
-      })
+        todos: viewer.todos,
+        viewer,
+      }),
     );
   };
 
   render() {
-    const numCompletedTodos = this.props.viewer.completedCount;
-    const numRemainingTodos = this.props.viewer.totalCount - numCompletedTodos;
+    const { viewer } = this.props;
+    const numCompletedTodos = viewer.completedCount;
+    const numRemainingTodos = viewer.totalCount - numCompletedTodos;
+
     return (
       <footer className="footer">
         <span className="todo-count">
@@ -51,14 +54,14 @@ class TodoListFooter extends React.Component {
             <Link to="/completed" activeClassName="selected">Completed</Link>
           </li>
         </ul>
-        {numCompletedTodos > 0 &&
+        {numCompletedTodos > 0 && (
           <button
             className="clear-completed"
             onClick={this._handleRemoveCompletedTodosClick}
           >
             Clear completed
           </button>
-        }
+        )}
       </footer>
     );
   }

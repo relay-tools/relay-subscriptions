@@ -1,9 +1,8 @@
 {
-  "presets": ["es2015", "react"],
-  "plugins": [
-    "transform-object-rest-spread",
-    "transform-class-properties",
-    "transform-export-extensions",
-    "syntax-trailing-function-commas"
-  ]
+  "presets": [
+    ["es2015", { "loose": true }],
+    "stage-2",
+    "react"
+  ],
+  "plugins": ["dev-expression"]
 }

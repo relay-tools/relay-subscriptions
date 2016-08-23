@@ -23,29 +23,21 @@ class TodoList extends React.Component {
   };
 
   _handleMarkAllChange = (e) => {
-    const complete = e.target.checked;
-    this.props.relay.commitUpdate(
+    const { relay, viewer } = this.props;
+    relay.commitUpdate(
       new MarkAllTodosMutation({
-        complete,
-        todos: this.props.viewer.todos,
-        viewer: this.props.viewer,
-      })
+        todos: viewer.todos,
+        viewer,
+        complete: e.target.checked,
+      }),
     );
   };
 
-  renderTodos() {
-    return this.props.viewer.todos.edges.map(edge =>
-      <Todo
-        key={edge.node.id}
-        todo={edge.node}
-        viewer={this.props.viewer}
-      />
-    );
-  }
-
   render() {
-    const numTodos = this.props.viewer.totalCount;
-    const numCompletedTodos = this.props.viewer.completedCount;
+    const { viewer } = this.props;
+    const numTodos = viewer.totalCount;
+    const numCompletedTodos = viewer.completedCount;
+
     return (
       <section className="main">
         <input
@@ -58,7 +50,13 @@ class TodoList extends React.Component {
           Mark all as complete
         </label>
         <ul className="todo-list">
-          {this.renderTodos()}
+          {viewer.todos.edges.map(({ node }) => (
+            <Todo
+              key={node.id}
+              todo={node}
+              viewer={viewer}
+            />
+          ))}
         </ul>
       </section>
     );
