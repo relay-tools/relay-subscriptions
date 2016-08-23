@@ -1,5 +1,5 @@
 import Relay from 'react-relay';
-import * as RelaySubscriptions from 'relay-subscriptions';
+import RelaySubscriptions from 'relay-subscriptions';
 
 export default class RemoveTodoSubscription extends RelaySubscriptions.Subscription {
   static fragments = {

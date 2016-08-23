@@ -1,13 +1,11 @@
 /* @flow */
-import { Environment } from 'react-relay';
 
 export type Variables = {[name: string]: mixed};
 export type RelayConcreteNode = {[name: string]: mixed};
-export type RelayEnvironment = typeof Environment;
-export type SubscriptionResult = {[name: string]: mixed};
 
-export type Subscription = {
-  dispose(): void;
+export type MutationConfig = {
+  type: string;
+  [name: string]: mixed;
 };
 
 export type PrintedQuery = {
@@ -15,7 +13,18 @@ export type PrintedQuery = {
   variables: Variables;
 };
 
-export type MutationConfig = {
-  type: string;
-  [name: string]: mixed;
-};
+export type SubscriptionResult = {[name: string]: mixed};
+
+export type SubscriptionObserver = {
+  onNext?: (value: SubscriptionResult) => void;
+  onError?: (error: any) => void;
+  onCompleted?: (value: any) => void;
+}
+
+export type SubscriptionDisposable = {
+  dispose: () => void;
+}
+
+export type SubscriptionObservable = {
+  subscribe: (observer: SubscriptionObserver) => SubscriptionDisposable;
+}

@@ -1,29 +1,15 @@
 /* @flow */
-import invariant from 'invariant';
+
 import printQuery from 'react-relay/lib/printRelayQuery';
 import RelayQuery from 'react-relay/lib/RelayQuery';
-import type {
-  Subscription,
-  SubscriptionResult,
-  Variables,
-  PrintedQuery,
-} from './types';
+
+import type { PrintedQuery, Variables } from './types';
 
 export default class SubscriptionRequest {
-  _active: boolean;
-  _disposable: ?Subscription;
-  _disposed: boolean;
-  _observers: Array<Function>;
-  _observersCount: number;
   _printedQuery: ?PrintedQuery;
   _subscription: RelayQuery.Subscription;
 
   constructor(subscription: RelayQuery.Subscription) {
-    this._active = true;
-    this._disposable = null;
-    this._disposed = false;
-    this._observers = [];
-    this._observersCount = 0;
     this._printedQuery = null;
     this._subscription = subscription;
   }
@@ -33,111 +19,22 @@ export default class SubscriptionRequest {
   }
 
   getVariables(): Variables {
-    if (!this._printedQuery) {
-      this._printedQuery = printQuery(this._subscription);
-    }
-    return this._printedQuery.variables;
+    return this._getPrintedQuery().variables;
   }
 
   getQueryString(): string {
+    return this._getPrintedQuery().text;
+  }
+
+  _getPrintedQuery(): PrintedQuery {
     if (!this._printedQuery) {
       this._printedQuery = printQuery(this._subscription);
     }
-    return this._printedQuery.text;
-  }
 
-  subscribe(observer: Function): Subscription {
-    invariant(
-      this._active,
-      'SubscriptionRequest: Cannot subscribe to disposed subscription.'
-    );
-
-    const observerIndex = this._observers.length;
-    this._observers.push(observer);
-    this._observersCount += 1;
-
-    return {
-      dispose: () => {
-        invariant(
-          this._observers[observerIndex],
-          'SubscriptionRequest: Subscriptions may only be disposed once',
-        );
-        delete this._observers[observerIndex];
-        this._observersCount -= 1;
-        if (this._observersCount === 0) {
-          this.dispose();
-        }
-      },
-    };
-  }
-
-  dispose() {
-    this._active = false;
-    if (!this._disposed) {
-      this._disposed = true;
-      if (this._disposable) {
-        this._disposable.dispose();
-      }
-    }
-  }
-
-  setDisposable(disposable: Subscription): void {
-    invariant(
-      !this._disposable,
-      'SubscriptionRequest: attempting to set disposable more than once'
-    );
-
-    this._disposable = disposable;
-
-    if (this._disposed) {
-      this._disposable.dispose();
-    }
-  }
-
-  onNext(result: SubscriptionResult): void {
-    if (this._active) {
-      try {
-        this._observers.forEach(observer => {
-          if (observer.onNext) observer.onNext(result);
-        });
-      } catch (e) {
-        this.dispose();
-        throw e;
-      }
-    }
-  }
-
-  onError(error: any): void {
-    if (this._active) {
-      this._active = false;
-      try {
-        this._observers.forEach(observer => {
-          if (observer.onError) observer.onError(error);
-        });
-      } finally {
-        this.dispose();
-      }
-    }
-  }
-
-  onCompleted(): void {
-    if (this._active) {
-      this._active = false;
-      try {
-        this._observers.forEach(observer => {
-          if (observer.onCompleted) observer.onCompleted();
-        });
-      } finally {
-        this.dispose();
-      }
-    }
-  }
-
-  getSubscription(): RelayQuery.Subscription {
-    return this._subscription;
+    return this._printedQuery;
   }
 
   getClientSubscriptionId(): string {
-    return this.getSubscription().getVariables().input.clientSubscriptionId;
+    return this._subscription.getVariables().input.clientSubscriptionId;
   }
 }

@@ -15,43 +15,50 @@ import 'todomvc-common';
 import { createHashHistory } from 'history';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Relay from 'react-relay';
-import { applyRouterMiddleware, IndexRoute, Route, Router, useRouterHistory }
-  from 'react-router';
+import {
+  applyRouterMiddleware,
+  IndexRoute,
+  Route,
+  Router,
+  useRouterHistory,
+} from 'react-router';
 import useRelay from 'react-router-relay';
+import RelaySubscriptions from 'relay-subscriptions';
 
+import NetworkLayer from './NetworkLayer';
 import TodoApp from './components/TodoApp';
 import TodoList from './components/TodoList';
-import Root from './components/Root';
 import ViewerQueries from './queries/ViewerQueries';
 
 const history = useRouterHistory(createHashHistory)({ queryKey: false });
+
+const environment = new RelaySubscriptions.Environment();
+environment.injectNetworkLayer(new NetworkLayer('/graphql'));
+
 const mountNode = document.getElementById('root');
 
 ReactDOM.render(
-  <Root environment={Relay.Store}>
-    <Router
-      environment={Relay.Store}
-      history={history}
-      render={applyRouterMiddleware(useRelay)}
+  <Router
+    environment={environment}
+    history={history}
+    render={applyRouterMiddleware(useRelay)}
+  >
+    <Route
+      path="/"
+      component={TodoApp}
+      queries={ViewerQueries}
     >
-      <Route
-        path="/"
-        component={TodoApp}
+      <IndexRoute
+        component={TodoList}
         queries={ViewerQueries}
-      >
-        <IndexRoute
-          component={TodoList}
-          queries={ViewerQueries}
-          prepareParams={() => ({ status: 'any' })}
-        />
-        <Route
-          path=":status"
-          component={TodoList}
-          queries={ViewerQueries}
-        />
-      </Route>
-    </Router>
-  </Root>,
+        prepareParams={() => ({ status: 'any' })}
+      />
+      <Route
+        path=":status"
+        component={TodoList}
+        queries={ViewerQueries}
+      />
+    </Route>
+  </Router>,
   mountNode
 );

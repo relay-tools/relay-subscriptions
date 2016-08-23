@@ -1,13 +1,15 @@
 /* @flow */
+
+import type Relay from 'react-relay';
+import type RelayQuery from 'react-relay/lib/RelayQuery';
+
 import type {
   MutationConfig,
-  RelayEnvironment,
   SubscriptionResult,
 } from './types';
-import RelayQuery from 'react-relay/lib/RelayQuery';
 
 export default function updateStoreData(
-  environment: RelayEnvironment,
+  environment: Relay.Environment,
   configs: Array<MutationConfig>,
   query: RelayQuery.Operation,
   payload: SubscriptionResult

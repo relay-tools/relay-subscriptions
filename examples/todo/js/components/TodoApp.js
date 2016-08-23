@@ -12,7 +12,7 @@
 
 import React from 'react';
 import Relay from 'react-relay';
-import * as RelaySubscriptions from 'relay-subscriptions';
+import RelaySubscriptions from 'relay-subscriptions';
 
 import AddTodoMutation from '../mutations/AddTodoMutation';
 import AddTodoSubscription from '../subscriptions/AddTodoSubscription';
@@ -24,33 +24,38 @@ class TodoApp extends React.Component {
   static propTypes = {
     viewer: React.PropTypes.object.isRequired,
     relay: React.PropTypes.object.isRequired,
-    subscriptions: React.PropTypes.object.isRequired,
     children: React.PropTypes.node.isRequired,
   };
 
   componentDidMount() {
-    const subscribe = this.props.subscriptions.subscribe;
-    this._addSubscription = subscribe(
-      new AddTodoSubscription({ viewer: this.props.viewer })
+    const { relay, viewer } = this.props;
+    this._addSubscription = relay.subscribe(
+      new AddTodoSubscription({ viewer }),
     );
-    this._removeSubscription = subscribe(
-      new RemoveTodoSubscription({ viewer: this.props.viewer })
+    this._removeSubscription = relay.subscribe(
+      new RemoveTodoSubscription({ viewer }),
     );
   }
 
   componentWillUnmount() {
-    if (this._addSubscription) this._addSubscription.dispose();
-    if (this._removeSubscription) this._removeSubscription.dispose();
+    if (this._addSubscription) {
+      this._addSubscription.dispose();
+    }
+    if (this._removeSubscription) {
+      this._removeSubscription.dispose();
+    }
   }
 
   _handleTextInputSave = (text) => {
-    this.props.relay.commitUpdate(
-      new AddTodoMutation({ text, viewer: this.props.viewer })
+    const { relay, viewer } = this.props;
+    relay.commitUpdate(
+      new AddTodoMutation({ viewer, text }),
     );
   };
 
   render() {
-    const hasTodos = this.props.viewer.totalCount > 0;
+    const { viewer, children } = this.props;
+    const hasTodos = viewer.totalCount > 0;
 
     return (
       <div>
@@ -67,14 +72,14 @@ class TodoApp extends React.Component {
             />
           </header>
 
-          {this.props.children}
+          {children}
 
-          {hasTodos &&
+          {hasTodos && (
             <TodoListFooter
-              todos={this.props.viewer.todos}
-              viewer={this.props.viewer}
+              todos={viewer.todos}
+              viewer={viewer}
             />
-          }
+          )}
         </section>
         <footer className="info">
           <p>
@@ -94,7 +99,7 @@ class TodoApp extends React.Component {
   }
 }
 
-export default Relay.createContainer(RelaySubscriptions.createSubscriptionContainer(TodoApp), {
+export default RelaySubscriptions.createContainer(TodoApp, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on User {
