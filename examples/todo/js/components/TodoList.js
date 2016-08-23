@@ -34,7 +34,7 @@ class TodoList extends React.Component {
   };
 
   render() {
-    const { viewer } = this.props;
+    const { viewer, relay } = this.props;
     const numTodos = viewer.totalCount;
     const numCompletedTodos = viewer.completedCount;
 
@@ -50,11 +50,12 @@ class TodoList extends React.Component {
           Mark all as complete
         </label>
         <ul className="todo-list">
-          {viewer.todos.edges.map(({ node }) => (
+          {viewer.todos.edges.map(edge => (
             <Todo
-              key={node.id}
-              todo={node}
+              key={edge.node.id}
+              todo={edge.node}
               viewer={viewer}
+              pending={relay.hasOptimisticUpdate(edge)}
             />
           ))}
         </ul>

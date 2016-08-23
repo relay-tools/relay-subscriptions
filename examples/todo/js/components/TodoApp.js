@@ -27,25 +27,6 @@ class TodoApp extends React.Component {
     children: React.PropTypes.node.isRequired,
   };
 
-  componentDidMount() {
-    const { relay, viewer } = this.props;
-    this._addSubscription = relay.subscribe(
-      new AddTodoSubscription({ viewer }),
-    );
-    this._removeSubscription = relay.subscribe(
-      new RemoveTodoSubscription({ viewer }),
-    );
-  }
-
-  componentWillUnmount() {
-    if (this._addSubscription) {
-      this._addSubscription.dispose();
-    }
-    if (this._removeSubscription) {
-      this._removeSubscription.dispose();
-    }
-  }
-
   _handleTextInputSave = (text) => {
     const { relay, viewer } = this.props;
     relay.commitUpdate(
@@ -111,4 +92,9 @@ export default RelaySubscriptions.createContainer(TodoApp, {
       }
     `,
   },
+
+  subscriptions: [
+    ({ viewer }) => new AddTodoSubscription({ viewer }),
+    ({ viewer }) => new RemoveTodoSubscription({ viewer }),
+  ],
 });
