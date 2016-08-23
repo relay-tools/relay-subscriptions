@@ -12,36 +12,41 @@
 
 import 'todomvc-common';
 
+import { createHashHistory } from 'history';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Relay from 'react-relay';
-import {IndexRoute, Route, Router} from 'react-router';
+import { applyRouterMiddleware, IndexRoute, Route, Router, useRouterHistory }
+  from 'react-router';
+import useRelay from 'react-router-relay';
+
 import TodoApp from './components/TodoApp';
 import TodoList from './components/TodoList';
+import Root from './components/Root';
 import ViewerQueries from './queries/ViewerQueries';
 
-import {createHashHistory} from 'history';
 const history = useRouterHistory(createHashHistory)({ queryKey: false });
 const mountNode = document.getElementById('root');
-import {applyRouterMiddleware, useRouterHistory} from 'react-router';
-import useRelay from 'react-router-relay';
-import Root from './components/Root';
 
 ReactDOM.render(
   <Root environment={Relay.Store}>
     <Router
       environment={Relay.Store}
       history={history}
-      render={applyRouterMiddleware(useRelay)}>
-      <Route path="/"
+      render={applyRouterMiddleware(useRelay)}
+    >
+      <Route
+        path="/"
         component={TodoApp}
-        queries={ViewerQueries}>
+        queries={ViewerQueries}
+      >
         <IndexRoute
           component={TodoList}
           queries={ViewerQueries}
           prepareParams={() => ({ status: 'any' })}
         />
-        <Route path=":status"
+        <Route
+          path=":status"
           component={TodoList}
           queries={ViewerQueries}
         />

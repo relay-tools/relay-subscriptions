@@ -1201,16 +1201,20 @@
                   "name": "input",
                   "description": null,
                   "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TodoSubscriptionInput",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "AddTodoSubscriptionInput",
+                      "ofType": null
+                    }
                   },
                   "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "AddTodoSubscription",
+                "name": "AddTodoSubscriptionPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1224,16 +1228,20 @@
                   "name": "input",
                   "description": null,
                   "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TodoSubscriptionInput",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "RemoveTodoSubscriptionInput",
+                      "ofType": null
+                    }
                   },
                   "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "RemoveTodoSubscription",
+                "name": "RemoveTodoSubscriptionPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1247,16 +1255,20 @@
                   "name": "input",
                   "description": null,
                   "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TodoSubscriptionInput",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "UpdateTodoSubscriptionInput",
+                      "ofType": null
+                    }
                   },
                   "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "UpdateTodoSubscription",
+                "name": "UpdateTodoSubscriptionPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1270,7 +1282,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "TodoSubscriptionInput",
+          "name": "AddTodoSubscriptionInput",
           "description": null,
           "fields": null,
           "inputFields": [
@@ -1278,9 +1290,13 @@
               "name": "clientSubscriptionId",
               "description": null,
               "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "defaultValue": null
             }
@@ -1291,21 +1307,9 @@
         },
         {
           "kind": "OBJECT",
-          "name": "AddTodoSubscription",
+          "name": "AddTodoSubscriptionPayload",
           "description": null,
           "fields": [
-            {
-              "name": "clientSubscriptionId",
-              "description": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
             {
               "name": "todo",
               "description": null,
@@ -1341,6 +1345,22 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "clientSubscriptionId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1349,22 +1369,35 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "RemoveTodoSubscription",
+          "kind": "INPUT_OBJECT",
+          "name": "RemoveTodoSubscriptionInput",
           "description": null,
-          "fields": [
+          "fields": null,
+          "inputFields": [
             {
               "name": "clientSubscriptionId",
               "description": null,
-              "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "RemoveTodoSubscriptionPayload",
+          "description": null,
+          "fields": [
             {
               "name": "deletedTodoId",
               "description": null,
@@ -1388,6 +1421,22 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "clientSubscriptionId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1396,22 +1445,49 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "UpdateTodoSubscription",
+          "kind": "INPUT_OBJECT",
+          "name": "UpdateTodoSubscriptionInput",
           "description": null,
-          "fields": [
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": null,
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
             {
               "name": "clientSubscriptionId",
               "description": null,
-              "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "UpdateTodoSubscriptionPayload",
+          "description": null,
+          "fields": [
             {
               "name": "todo",
               "description": null,
@@ -1432,6 +1508,22 @@
                 "kind": "OBJECT",
                 "name": "User",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "clientSubscriptionId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

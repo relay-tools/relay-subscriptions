@@ -10,30 +10,41 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import classnames from 'classnames';
+import React from 'react';
+import Relay from 'react-relay';
+import * as RelaySubscriptions from 'relay-subscriptions';
+
 import ChangeTodoStatusMutation from '../mutations/ChangeTodoStatusMutation';
 import RemoveTodoMutation from '../mutations/RemoveTodoMutation';
 import RenameTodoMutation from '../mutations/RenameTodoMutation';
-import TodoTextInput from './TodoTextInput';
-import * as RelaySubscriptions from 'relay-subscriptions';
 import UpdateTodoSubscription from '../subscriptions/UpdateTodoSubscription';
-
-import React from 'react';
-import Relay from 'react-relay';
-import classnames from 'classnames';
+import TodoTextInput from './TodoTextInput';
 
 class Todo extends React.Component {
+  static propTypes = {
+    viewer: React.PropTypes.object.isRequired,
+    todo: React.PropTypes.object.isRequired,
+    relay: React.PropTypes.object.isRequired,
+    subscriptions: React.PropTypes.object.isRequired,
+  };
+
   state = {
     isEditing: false,
   };
+
   componentDidMount() {
-    this._updateSubscription = this.props.subscriptions.subscribe(
-      new UpdateTodoSubscription({ todo: this.props.todo }),
-      `update_todo_${this.props.todo.id}`
-    );
+    if (!this.props.relay.hasOptimisticUpdate(this.props.todo)) {
+      this._updateSubscription = this.props.subscriptions.subscribe(
+        new UpdateTodoSubscription({ todo: this.props.todo })
+      );
+    }
   }
+
   componentWillUnmount() {
     if (this._updateSubscription) this._updateSubscription.dispose();
   }
+
   _handleCompleteChange = (e) => {
     const complete = e.target.checked;
     this.props.relay.commitUpdate(
@@ -44,38 +55,46 @@ class Todo extends React.Component {
       })
     );
   };
+
   _handleDestroyClick = () => {
     this._removeTodo();
   };
+
   _handleLabelDoubleClick = () => {
     this._setEditMode(true);
   };
+
   _handleTextInputCancel = () => {
     this._setEditMode(false);
   };
+
   _handleTextInputDelete = () => {
     this._setEditMode(false);
     this._removeTodo();
   };
+
   _handleTextInputSave = (text) => {
     this._setEditMode(false);
     this.props.relay.commitUpdate(
-      new RenameTodoMutation({todo: this.props.todo, text})
+      new RenameTodoMutation({ todo: this.props.todo, text })
     );
   };
+
   _removeTodo() {
     this.props.relay.commitUpdate(
-      new RemoveTodoMutation({todo: this.props.todo, viewer: this.props.viewer})
+      new RemoveTodoMutation({ todo: this.props.todo, viewer: this.props.viewer })
     );
   }
+
   _setEditMode = (shouldEdit) => {
-    this.setState({isEditing: shouldEdit});
+    this.setState({ isEditing: shouldEdit });
   };
+
   renderTextInput() {
     return (
       <TodoTextInput
         className="edit"
-        commitOnBlur={true}
+        commitOnBlur
         initialValue={this.props.todo.text}
         onCancel={this._handleTextInputCancel}
         onDelete={this._handleTextInputDelete}
@@ -83,13 +102,15 @@ class Todo extends React.Component {
       />
     );
   }
+
   render() {
     return (
       <li
         className={classnames({
           completed: this.props.todo.complete,
           editing: this.state.isEditing,
-        })}>
+        })}
+      >
         <div className="view">
           <input
             checked={this.props.todo.complete}
@@ -115,19 +136,19 @@ export default Relay.createContainer(RelaySubscriptions.createSubscriptionContai
   fragments: {
     todo: () => Relay.QL`
       fragment on Todo {
-        complete,
-        id,
-        text,
-        ${ChangeTodoStatusMutation.getFragment('todo')},
-        ${RemoveTodoMutation.getFragment('todo')},
-        ${RenameTodoMutation.getFragment('todo')},
+        id
+        complete
+        text
+        ${ChangeTodoStatusMutation.getFragment('todo')}
+        ${RemoveTodoMutation.getFragment('todo')}
+        ${RenameTodoMutation.getFragment('todo')}
         ${UpdateTodoSubscription.getFragment('todo')}
       }
     `,
     viewer: () => Relay.QL`
       fragment on User {
-        ${ChangeTodoStatusMutation.getFragment('viewer')},
-        ${RemoveTodoMutation.getFragment('viewer')},
+        ${ChangeTodoStatusMutation.getFragment('viewer')}
+        ${RemoveTodoMutation.getFragment('viewer')}
       }
     `,
   },

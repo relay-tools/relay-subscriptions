@@ -10,64 +10,112 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* eslint-disable no-console */
+
 import express from 'express';
 import graphQLHTTP from 'express-graphql';
 import { graphql } from 'graphql';
+import { graphqlSubscribe } from 'graphql-relay-subscription';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-import { addNotifier, removeNotifier } from './data/database';
+
+import { addNotifier } from './data/database';
 import { schema } from './data/schema';
 
 const APP_PORT = 3000;
 const GRAPHQL_PORT = 8080;
 
 // Expose a GraphQL endpoint
-const graphQLServer = express();
-graphQLServer.use('/', graphQLHTTP({ schema, pretty: true, graphiql: true }));
-const server = graphQLServer.listen(GRAPHQL_PORT, () => console.log(
-  `GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`
-));
+const graphQLApp = express();
+graphQLApp.use('/', graphQLHTTP({ schema, pretty: true, graphiql: true }));
 
-const io = require('socket.io')(server);
+const graphQLServer = graphQLApp.listen(GRAPHQL_PORT, () => {
+  console.log(
+    `GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}`
+  );
+});
+
+const io = require('socket.io')(graphQLServer, {
+  serveClient: false,
+});
 
 io.on('connection', socket => {
-  const topics = {};
-  const onEvent = ({ topic: topicName, data }) => {
-    const topic = topics[topicName];
-    if (!topic) return;
-    topic.forEach(({ id, query, variables }) => {
+  const topics = Object.create(null);
+  const unsubscribeMap = Object.create(null);
+
+  const removeNotifier = addNotifier(({ topic, data }) => {
+    const topicListeners = topics[topic];
+    if (!topicListeners) return;
+
+    topicListeners.forEach(({ id, query, variables }) => {
       graphql(
         schema,
         query,
+        data,
         null,
-        { data },
         variables
-      ).then(payload => {
-        socket.emit(`subscription:${id}`, { type: 'response', ...payload });
+      ).then((result) => {
+        socket.emit('subscription update', { id, ...result });
       });
     });
-  };
-  addNotifier(onEvent);
+  });
 
-  socket.on('new subscription', ({ topic, id, query, variables }) => {
-    topics[topic] = topics[topic] || [];
-    topics[topic].push({ topic, id, query, variables });
-    console.log(
-      'New subscription for topic %s. Total subscription for topic: %s',
-      topic,
-      topics[topic].length
-    );
+  socket.on('new subscription', ({ id, query, variables }) => {
+    function unsubscribe(topic, subscription) {
+      const index = topics[topic].indexOf(subscription);
+      if (index === -1) return;
+
+      topics[topic].splice(index);
+
+      console.log(
+        'Removed subscription for topic %s. Total subscriptions for topic: %d',
+        topic,
+        topics[topic].length
+      );
+    }
+
+    function subscribe(topic) {
+      topics[topic] = topics[topic] || [];
+      const subscription = { id, query, variables };
+
+      topics[topic].push(subscription);
+
+      unsubscribeMap[id] = () => {
+        unsubscribe(topic, subscription);
+      };
+
+      console.log(
+        'New subscription for topic %s. Total subscriptions for topic: %d',
+        topic,
+        topics[topic].length
+      );
+    }
+
+    graphqlSubscribe({
+      schema,
+      query,
+      variables,
+      context: { subscribe },
+    }).then((result) => {
+      if (result.errors) {
+        console.error('Subscribe failed', result.errors);
+      }
+    });
   });
-  socket.on('close subscription', ({ topic, id }) => {
-    const subscription = topics[topic].find(sub => sub.id === id);
-    if (!subscription) return;
-    topics[topic].splice(topics[topic].indexOf(subscription), 1);
-    socket.emit(`subscription:${id}`, { type: 'closed' });
+
+  socket.on('close subscription', (id) => {
+    const unsubscribe = unsubscribeMap[id];
+    if (!unsubscribe) return;
+
+    unsubscribe();
+    delete unsubscribeMap[id];
+    socket.emit('subscription closed', id);
   });
+
   socket.on('disconnect', () => {
     console.log('Socket disconnect');
-    removeNotifier(onEvent);
+    removeNotifier();
   });
 });
 
@@ -86,6 +134,7 @@ const compiler = webpack({
   },
   output: { filename: 'app.js', path: '/' },
 });
+
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   proxy: {
@@ -95,6 +144,7 @@ const app = new WebpackDevServer(compiler, {
   publicPath: '/js/',
   stats: { colors: true },
 });
+
 // Serve static resources
 app.use('/', express.static(path.resolve(__dirname, 'public')));
 app.listen(APP_PORT, () => {

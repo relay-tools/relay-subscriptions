@@ -17,7 +17,6 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLInputObjectType,
   GraphQLSchema,
   GraphQLString,
 } from 'graphql';
@@ -34,6 +33,8 @@ import {
   toGlobalId,
 } from 'graphql-relay';
 
+import { subscriptionWithClientId } from 'graphql-relay-subscription';
+
 import {
   Todo,
   User,
@@ -49,9 +50,9 @@ import {
   renameTodo,
 } from './database';
 
-const {nodeInterface, nodeField} = nodeDefinitions(
+const { nodeInterface, nodeField } = nodeDefinitions(
   (globalId) => {
-    const {type, id} = fromGlobalId(globalId);
+    const { type, id } = fromGlobalId(globalId);
     if (type === 'Todo') {
       return getTodo(id);
     } else if (type === 'User') {
@@ -60,11 +61,13 @@ const {nodeInterface, nodeField} = nodeDefinitions(
     return null;
   },
   (obj) => {
+    /* eslint-disable no-use-before-define */
     if (obj instanceof Todo) {
       return GraphQLTodo;
     } else if (obj instanceof User) {
       return GraphQLUser;
     }
+    /* eslint-enable no-use-before-define */
     return null;
   }
 );
@@ -106,7 +109,7 @@ const GraphQLUser = new GraphQLObjectType({
         },
         ...connectionArgs,
       },
-      resolve: (obj, {status, ...args}) =>
+      resolve: (obj, { status, ...args }) =>
         connectionFromArray(getTodos(status), args),
     },
     totalCount: {
@@ -140,7 +143,7 @@ const GraphQLAddTodoMutation = mutationWithClientMutationId({
   outputFields: {
     todoEdge: {
       type: GraphQLTodoEdge,
-      resolve: ({localTodoId}) => {
+      resolve: ({ localTodoId }) => {
         const todo = getTodo(localTodoId);
         return {
           cursor: cursorForObjectInConnection(getTodos(), todo),
@@ -153,9 +156,9 @@ const GraphQLAddTodoMutation = mutationWithClientMutationId({
       resolve: () => getViewer(),
     },
   },
-  mutateAndGetPayload: ({text}) => {
+  mutateAndGetPayload: ({ text }) => {
     const localTodoId = addTodo(text);
-    return {localTodoId};
+    return { localTodoId };
   },
 });
 
@@ -168,17 +171,17 @@ const GraphQLChangeTodoStatusMutation = mutationWithClientMutationId({
   outputFields: {
     todo: {
       type: GraphQLTodo,
-      resolve: ({localTodoId}) => getTodo(localTodoId),
+      resolve: ({ localTodoId }) => getTodo(localTodoId),
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
   },
-  mutateAndGetPayload: ({id, complete}) => {
+  mutateAndGetPayload: ({ id, complete }) => {
     const localTodoId = fromGlobalId(id).id;
     changeTodoStatus(localTodoId, complete);
-    return {localTodoId};
+    return { localTodoId };
   },
 });
 
@@ -190,16 +193,16 @@ const GraphQLMarkAllTodosMutation = mutationWithClientMutationId({
   outputFields: {
     changedTodos: {
       type: new GraphQLList(GraphQLTodo),
-      resolve: ({changedTodoLocalIds}) => changedTodoLocalIds.map(getTodo),
+      resolve: ({ changedTodoLocalIds }) => changedTodoLocalIds.map(getTodo),
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
   },
-  mutateAndGetPayload: ({complete}) => {
+  mutateAndGetPayload: ({ complete }) => {
     const changedTodoLocalIds = markAllTodos(complete);
-    return {changedTodoLocalIds};
+    return { changedTodoLocalIds };
   },
 });
 
@@ -209,7 +212,7 @@ const GraphQLRemoveCompletedTodosMutation = mutationWithClientMutationId({
   outputFields: {
     deletedTodoIds: {
       type: new GraphQLList(GraphQLString),
-      resolve: ({deletedTodoIds}) => deletedTodoIds,
+      resolve: ({ deletedTodoIds }) => deletedTodoIds,
     },
     viewer: {
       type: GraphQLUser,
@@ -219,7 +222,7 @@ const GraphQLRemoveCompletedTodosMutation = mutationWithClientMutationId({
   mutateAndGetPayload: () => {
     const deletedTodoLocalIds = removeCompletedTodos();
     const deletedTodoIds = deletedTodoLocalIds.map(toGlobalId.bind(null, 'Todo'));
-    return {deletedTodoIds};
+    return { deletedTodoIds };
   },
 });
 
@@ -231,17 +234,17 @@ const GraphQLRemoveTodoMutation = mutationWithClientMutationId({
   outputFields: {
     deletedTodoId: {
       type: GraphQLID,
-      resolve: ({id}) => id,
+      resolve: ({ id }) => id,
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
   },
-  mutateAndGetPayload: ({id}) => {
+  mutateAndGetPayload: ({ id }) => {
     const localTodoId = fromGlobalId(id).id;
     removeTodo(localTodoId);
-    return {id};
+    return { id };
   },
 });
 
@@ -254,79 +257,76 @@ const GraphQLRenameTodoMutation = mutationWithClientMutationId({
   outputFields: {
     todo: {
       type: GraphQLTodo,
-      resolve: ({localTodoId}) => getTodo(localTodoId),
+      resolve: ({ localTodoId }) => getTodo(localTodoId),
     },
   },
-  mutateAndGetPayload: ({id, text}) => {
+  mutateAndGetPayload: ({ id, text }) => {
     const localTodoId = fromGlobalId(id).id;
     renameTodo(localTodoId, text);
-    return {localTodoId};
+    return { localTodoId };
   },
 });
 
-const GraphQLAddTodoSubscription = new GraphQLObjectType({
+const GraphQLAddTodoSubscription = subscriptionWithClientId({
   name: 'AddTodoSubscription',
-  fields: {
-    clientSubscriptionId: {
-      type: GraphQLID,
-      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
-    },
+  outputFields: {
     todo: {
       type: GraphQLTodo,
-      resolve: ({ data }) => data ? getTodo(data.id) : null,
+      resolve: obj => obj,
     },
     todoEdge: {
       type: GraphQLTodoEdge,
-      resolve: ({ data }) => {
-        const todo = data ? getTodo(data.id) : null;
-        return {
-          cursor: cursorForObjectInConnection(getTodos(), todo),
-          node: todo,
-        };
-      },
+      resolve: obj => ({
+        cursor: cursorForObjectInConnection(getTodos(), getTodo(obj.id)),
+        node: obj,
+      }),
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
-  }
+  },
+  subscribe: (input, context) => {
+    context.subscribe('add_todo');
+  },
 });
 
 
-const GraphQLRemoveTodoSubscription = new GraphQLObjectType({
+const GraphQLRemoveTodoSubscription = subscriptionWithClientId({
   name: 'RemoveTodoSubscription',
-  fields: {
-    clientSubscriptionId: {
-      type: GraphQLID,
-      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
-    },
+  outputFields: {
     deletedTodoId: {
       type: GraphQLID,
-      resolve: ({ data }) => data ? toGlobalId('Todo', data.id) : null,
+      resolve: ({ id }) => toGlobalId('Todo', id),
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
-  }
+  },
+  subscribe: (input, context) => {
+    context.subscribe('delete_todo');
+  },
 });
 
-const GraphQLUpdateTodoSubscription = new GraphQLObjectType({
+const GraphQLUpdateTodoSubscription = subscriptionWithClientId({
   name: 'UpdateTodoSubscription',
-  fields: {
-    clientSubscriptionId: {
-      type: GraphQLID,
-      resolve: ({ clientSubscriptionId }) => clientSubscriptionId,
-    },
+  inputFields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+  },
+  outputFields: {
     todo: {
       type: GraphQLTodo,
-      resolve: ({ data }) => data ? getTodo(data.id) : null,
+      resolve: obj => obj,
     },
     viewer: {
       type: GraphQLUser,
       resolve: () => getViewer(),
     },
-  }
+  },
+  subscribe: ({ id }, context) => {
+    context.subscribe(`update_todo_${fromGlobalId(id).id}`);
+  },
 });
 
 const Mutation = new GraphQLObjectType({
@@ -341,46 +341,12 @@ const Mutation = new GraphQLObjectType({
   },
 });
 
-const SubscriptionInput = new GraphQLInputObjectType({
-  name: 'TodoSubscriptionInput',
-  fields: {
-    clientSubscriptionId: { type: GraphQLID },
-  },
-});
-
 const Subscription = new GraphQLObjectType({
   name: 'Subscription',
   fields: {
-    addTodoSubscription: {
-      type: GraphQLAddTodoSubscription,
-      args: {
-        input: {
-          type: SubscriptionInput,
-        },
-      },
-      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({ clientSubscriptionId, data }),
-    },
-    removeTodoSubscription: {
-      type: GraphQLRemoveTodoSubscription,
-      args: {
-        input: {
-          type: SubscriptionInput,
-        }
-      },
-      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({ clientSubscriptionId, data }),
-    },
-    updateTodoSubscription: {
-      type: GraphQLUpdateTodoSubscription,
-      args: {
-        input: {
-          type: SubscriptionInput,
-        }
-      },
-      resolve: (_, { input: { clientSubscriptionId } }, { data }) => ({
-        clientSubscriptionId,
-        data,
-      }),
-    }
+    addTodoSubscription: GraphQLAddTodoSubscription,
+    removeTodoSubscription: GraphQLRemoveTodoSubscription,
+    updateTodoSubscription: GraphQLUpdateTodoSubscription,
   },
 });
 

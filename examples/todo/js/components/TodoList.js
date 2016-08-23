@@ -10,13 +10,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import MarkAllTodosMutation from '../mutations/MarkAllTodosMutation';
-import Todo from './Todo';
-
 import React from 'react';
 import Relay from 'react-relay';
 
+import MarkAllTodosMutation from '../mutations/MarkAllTodosMutation';
+import Todo from './Todo';
+
 class TodoList extends React.Component {
+  static propTypes = {
+    viewer: React.PropTypes.object.isRequired,
+    relay: React.PropTypes.object.isRequired,
+  };
+
   _handleMarkAllChange = (e) => {
     const complete = e.target.checked;
     this.props.relay.commitUpdate(
@@ -27,6 +32,7 @@ class TodoList extends React.Component {
       })
     );
   };
+
   renderTodos() {
     return this.props.viewer.todos.edges.map(edge =>
       <Todo
@@ -36,6 +42,7 @@ class TodoList extends React.Component {
       />
     );
   }
+
   render() {
     const numTodos = this.props.viewer.totalCount;
     const numCompletedTodos = this.props.viewer.completedCount;
@@ -63,7 +70,7 @@ export default Relay.createContainer(TodoList, {
     status: null,
   },
 
-  prepareVariables({status}) {
+  prepareVariables({ status }) {
     let nextStatus;
     if (status === 'active' || status === 'completed') {
       nextStatus = status;
@@ -80,22 +87,22 @@ export default Relay.createContainer(TodoList, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on User {
-        completedCount,
+        completedCount
         todos(
-          status: $status,
+          status: $status
           first: 2147483647  # max GraphQLInt
         ) {
           edges {
             node {
-              id,
-              ${Todo.getFragment('todo')},
-            },
-          },
-          ${MarkAllTodosMutation.getFragment('todos')},
-        },
-        totalCount,
-        ${MarkAllTodosMutation.getFragment('viewer')},
-        ${Todo.getFragment('viewer')},
+              id
+              ${Todo.getFragment('todo')}
+            }
+          }
+          ${MarkAllTodosMutation.getFragment('todos')}
+        }
+        totalCount
+        ${MarkAllTodosMutation.getFragment('viewer')}
+        ${Todo.getFragment('viewer')}
       }
     `,
   },

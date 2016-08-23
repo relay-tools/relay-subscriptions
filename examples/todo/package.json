@@ -18,6 +18,7 @@
     "express-graphql": "0.5.2",
     "graphql": "0.6.0",
     "graphql-relay": "0.4.2",
+    "graphql-relay-subscription": "^0.1.0",
     "history": "2.1.2",
     "map": "^1.0.1",
     "react": "15.1.0",
