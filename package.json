@@ -5,12 +5,12 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "rimraf lib && babel src --ignore __tests__ --out-dir lib",
-    "watch": "npm run build -- --watch",
-    "test": "npm run lint && npm run check && npm run testonly",
-    "lint": "eslint examples src",
     "check": "flow check src",
+    "lint": "eslint examples src",
+    "prepublish": "npm run build",
+    "test": "npm run lint && npm run check && npm run testonly",
     "testonly": "jest",
-    "prepublish": "npm run build"
+    "watch": "npm run build -- --watch"
   },
   "repository": {
     "type": "git",
@@ -63,14 +63,6 @@
     "rimraf": "^2.5.4"
   },
   "jest": {
-    "unmockedModulePathPatterns": [
-      "<rootDir>/node_modules/react/",
-      "<rootDir>/node_modules/react-dom/",
-      "<rootDir>/node_modules/core-js/",
-      "<rootDir>/node_modules/react-relay/",
-      "<rootDir>/node_modules/invariant/",
-      "<rootDir>/node_modules/warning/",
-      "<rootDir>/node_modules/enzyme"
-    ]
+    "automock": false
   }
 }
