@@ -8,11 +8,7 @@ import RelayStoreData from 'react-relay/lib/RelayStoreData';
 import createSubscriptionQuery from './createSubscriptionQuery';
 import type Subscription from './Subscription';
 import SubscriptionRequest from './SubscriptionRequest';
-import type {
-  SubscriptionDisposable,
-  SubscriptionObservable,
-  SubscriptionObserver,
-} from './types';
+import type { SubscriptionDisposable, SubscriptionObserver } from './types';
 import updateStoreData from './updateStoreData';
 
 // Override a few Relay classes to use our own network layer proxy that
@@ -21,7 +17,7 @@ import updateStoreData from './updateStoreData';
 class NetworkLayer extends RelayNetworkLayer {
   sendSubscription(
     subscriptionRequest: SubscriptionRequest,
-  ): SubscriptionObservable {
+  ): SubscriptionDisposable {
     const implementation = this._getImplementation();
     invariant(
       implementation.sendSubscription,
@@ -73,28 +69,35 @@ export default class Environment extends Relay.Environment {
       },
     });
 
-    const networkLayer = this._storeData.getNetworkLayer();
-    const subscriptionObservable = networkLayer.sendSubscription(
-      new SubscriptionRequest(query),
-    );
+    const onPayload = (payload) => {
+      updateStoreData(this, subscription.getConfigs(), query, payload);
+    };
 
-    return subscriptionObservable.subscribe({
-      onNext: (payload) => {
-        updateStoreData(this, subscription.getConfigs(), query, payload);
-        if (observer && observer.onNext) {
-          observer.onNext(payload);
-        }
-      },
-      onError: (error) => {
-        if (observer && observer.onError) {
-          observer.onError(error);
-        }
-      },
-      onCompleted: () => {
-        if (observer && observer.onCompleted) {
-          observer.onCompleted();
-        }
-      },
-    });
+    let subscriptionObserver;
+    if (observer) {
+      const definedObserver = observer; // Placate flow.
+      subscriptionObserver = {
+        onNext: (payload) => {
+          onPayload(payload);
+          definedObserver.onNext(payload);
+        },
+        onError: (error) => {
+          definedObserver.onError(error);
+        },
+        onCompleted: (value) => {
+          definedObserver.onCompleted(value);
+        },
+      };
+    } else {
+      subscriptionObserver = {
+        onNext: onPayload,
+        onError: () => {},
+        onCompleted: () => {},
+      };
+    }
+
+    return this._storeData.getNetworkLayer().sendSubscription(
+      new SubscriptionRequest(query, subscriptionObserver),
+    );
   }
 }

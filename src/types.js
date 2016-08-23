@@ -16,15 +16,11 @@ export type PrintedQuery = {
 export type SubscriptionResult = {[name: string]: mixed};
 
 export type SubscriptionObserver = {
-  onNext?: (value: SubscriptionResult) => void;
-  onError?: (error: any) => void;
-  onCompleted?: (value: any) => void;
+  onNext: (value: SubscriptionResult) => void;
+  onError: (error: any) => void;
+  onCompleted: (value: any) => void;
 }
 
 export type SubscriptionDisposable = {
   dispose: () => void;
-}
-
-export type SubscriptionObservable = {
-  subscribe: (observer: SubscriptionObserver) => SubscriptionDisposable;
 }
