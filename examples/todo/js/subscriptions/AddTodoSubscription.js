@@ -1,7 +1,7 @@
 import Relay from 'react-relay';
-import RelaySubscriptions from 'relay-subscriptions';
+import { Subscription } from 'relay-subscriptions';
 
-export default class AddTodoSubscription extends RelaySubscriptions.Subscription {
+export default class AddTodoSubscription extends Subscription {
   static fragments = {
     viewer: () => Relay.QL`
       fragment on User {

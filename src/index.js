@@ -5,3 +5,4 @@ import Environment from './Environment';
 import Subscription from './Subscription';
 
 export default { createContainer, Environment, Subscription };
+export { createContainer, Environment, Subscription };
