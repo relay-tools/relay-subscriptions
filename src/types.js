@@ -21,10 +21,12 @@ export type SubscriptionObserver = {
   onCompleted?: (value: any) => void;
 }
 
-export type SubscriptionDisposable = {
-  dispose: () => void;
+export type SubscriptionRequestObserver = {
+  onNext: (value: SubscriptionResult) => void;
+  onError: (error: any) => void;
+  onCompleted: (value: any) => void;
 }
 
-export type SubscriptionObservable = {
-  subscribe: (observer: SubscriptionObserver) => SubscriptionDisposable;
+export type SubscriptionDisposable = {
+  dispose: () => void;
 }

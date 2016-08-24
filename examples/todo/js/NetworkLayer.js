@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 
-import invariant from 'invariant';
 import Relay from 'react-relay';
 import io from 'socket.io-client';
 
@@ -9,61 +8,53 @@ export default class NetworkLayer extends Relay.DefaultNetworkLayer {
     super(...args);
 
     this._socket = io();
-    this._observers = {};
+    this._requests = {};
 
     this._socket.on('subscription update', ({ id, data, errors }) => {
-      const observer = this._observers[id];
-      if (!observer) return;
+      const request = this._requests[id];
+      if (!request) {
+        return;
+      }
 
       if (errors) {
-        observer.onError(errors);
+        request.onError(errors);
       } else {
-        observer.onNext(data);
+        request.onNext(data);
       }
     });
 
     this._socket.on('subscription closed', (id) => {
-      const observer = this._observers[id];
-      if (!observer) {
+      const request = this._requests[id];
+      if (!request) {
         return;
       }
 
       console.log(`Subscription ${id} is completed`);
-      observer.onCompleted();
-      delete this._observers[id];
+      request.onCompleted();
+      delete this._requests[id];
     });
 
     this._socket.on('error', (error) => {
-      Object.values(this._observers).forEach((observer) => {
-        observer.onError(error);
+      Object.values(this._requests).forEach((request) => {
+        request.onError(error);
       });
     });
   }
 
   sendSubscription(request) {
     const id = request.getClientSubscriptionId();
+    this._requests[id] = request;
+
+    this._socket.emit('subscribe', {
+      id,
+      query: request.getQueryString(),
+      variables: request.getVariables(),
+    });
 
     return {
-      subscribe: (observer) => {
-        invariant(
-          !this._observers[id],
-          `Subscription ${id} already has an observer.`
-        );
-
-        this._observers[id] = observer;
-
-        this._socket.emit('subscribe', {
-          id,
-          query: request.getQueryString(),
-          variables: request.getVariables(),
-        });
-
-        return {
-          dispose: () => {
-            console.log(`disposing ${request.getDebugName()}:${id}`);
-            this._socket.emit('unsubscribe', id);
-          },
-        };
+      dispose: () => {
+        console.log(`disposing ${request.getDebugName()}:${id}`);
+        this._socket.emit('unsubscribe', id);
       },
     };
   }
@@ -71,8 +62,8 @@ export default class NetworkLayer extends Relay.DefaultNetworkLayer {
   disconnect() {
     this._socket.disconnect();
 
-    this._observers.forEach(observer => {
-      observer.onCompleted();
+    this._requests.forEach(request => {
+      request.onCompleted();
     });
   }
 }
