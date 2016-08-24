@@ -1,6 +1,8 @@
 import Relay from 'react-relay';
 import { Subscription } from 'relay-subscriptions';
 
+import Todo from '../components/Todo';
+
 export default class AddTodoSubscription extends Subscription {
   static fragments = {
     viewer: () => Relay.QL`
@@ -17,9 +19,7 @@ export default class AddTodoSubscription extends Subscription {
           todoEdge {
             __typename
             node {
-              id
-              text
-              complete
+              ${Todo.getFragment('todo')}
             }
           }
           viewer {

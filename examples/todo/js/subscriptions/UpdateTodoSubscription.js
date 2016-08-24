@@ -1,6 +1,8 @@
 import Relay from 'react-relay';
 import { Subscription } from 'relay-subscriptions';
 
+import Todo from '../components/Todo';
+
 export default class UpdateTodoSubscription extends Subscription {
   static fragments = {
     todo: () => Relay.QL`
@@ -15,9 +17,7 @@ export default class UpdateTodoSubscription extends Subscription {
       subscription {
         updateTodoSubscription(input: $input) {
           todo {
-            id
-            text
-            complete
+            ${Todo.getFragment('todo')}
           }
           viewer {
             id
