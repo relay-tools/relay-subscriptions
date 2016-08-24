@@ -24,10 +24,6 @@ export default class RemoveTodoSubscription extends Subscription {
     `;
   }
 
-  getVariables() {
-    return {};
-  }
-
   getConfigs() {
     return [{
       type: 'NODE_DELETE',
@@ -36,5 +32,9 @@ export default class RemoveTodoSubscription extends Subscription {
       connectionName: 'todos',
       deletedIDFieldName: 'deletedTodoId',
     }];
+  }
+
+  getVariables() {
+    return {};
   }
 }

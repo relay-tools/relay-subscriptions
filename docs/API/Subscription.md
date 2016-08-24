@@ -1,5 +1,5 @@
-# RelaySubscriptions.Subscription
-RelaySubscriptions makes use of the `Relay.Mutation` api.
+# Subscription
+RelaySubscriptions makes use of the `Relay.Mutation` API.
 If you are familiar with the mutation api this shouldn't be any new things.
 Except the `getSubscription` method which replaced `getMutation`.
 
@@ -113,7 +113,7 @@ Implement this required method to give Relay instructions on how to use the resp
 
 ### Example
 ```js
-class LikeStorySubscription extends RelaySubscriptions.Subscription {
+class LikeStorySubscription extends Subscription {
   getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
@@ -131,7 +131,7 @@ Implement this required method to return a GraphQL subscription operation that r
 
 ### Example
 ```js
-class LikeStorySubscription extends RelaySubscriptions.Subscription {
+class LikeStorySubscription extends Subscription {
   getSubscription() {
     return Relay.QL`subscription {
       likeStorySubscribe {

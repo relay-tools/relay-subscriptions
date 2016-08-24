@@ -28,12 +28,6 @@ export default class UpdateTodoSubscription extends Subscription {
     `;
   }
 
-  getVariables() {
-    return {
-      id: this.props.todo.id,
-    };
-  }
-
   getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
@@ -41,5 +35,11 @@ export default class UpdateTodoSubscription extends Subscription {
         todo: this.props.todo.id,
       },
     }];
+  }
+
+  getVariables() {
+    return {
+      id: this.props.todo.id,
+    };
   }
 }

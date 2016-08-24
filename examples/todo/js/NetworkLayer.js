@@ -8,7 +8,7 @@ export default class NetworkLayer extends Relay.DefaultNetworkLayer {
     super(...args);
 
     this._socket = io();
-    this._requests = {};
+    this._requests = Object.create(null);
 
     this._socket.on('subscription update', ({ id, data, errors }) => {
       const request = this._requests[id];

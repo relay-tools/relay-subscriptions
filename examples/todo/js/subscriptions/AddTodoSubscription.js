@@ -31,10 +31,6 @@ export default class AddTodoSubscription extends Subscription {
     `;
   }
 
-  getVariables() {
-    return {};
-  }
-
   getConfigs() {
     return [{
       type: 'RANGE_ADD',
@@ -44,5 +40,9 @@ export default class AddTodoSubscription extends Subscription {
       edgeName: 'todoEdge',
       rangeBehaviors: () => 'append',
     }];
+  }
+
+  getVariables() {
+    return {};
   }
 }
