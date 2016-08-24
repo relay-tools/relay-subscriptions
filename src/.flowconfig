@@ -2,9 +2,10 @@
 
 [include]
 ../node_modules/invariant
-../node_modules/warning
+../node_modules/lodash
 ../node_modules/react
 ../node_modules/react-relay
+../node_modules/warning
 
 [libs]
 

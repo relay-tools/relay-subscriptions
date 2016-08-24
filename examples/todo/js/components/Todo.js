@@ -32,21 +32,6 @@ class Todo extends React.Component {
     isEditing: false,
   };
 
-  componentDidMount() {
-    const { relay, todo } = this.props;
-    if (!relay.hasOptimisticUpdate(todo)) {
-      this._subscription = relay.subscribe(
-        new UpdateTodoSubscription({ todo }),
-      );
-    }
-  }
-
-  componentWillUnmount() {
-    if (this._subscription) {
-      this._subscription.dispose();
-    }
-  }
-
   _handleCompleteChange = (e) => {
     const { relay, todo, viewer } = this.props;
     relay.commitUpdate(
@@ -156,4 +141,8 @@ export default RelaySubscriptions.createContainer(Todo, {
       }
     `,
   },
+
+  subscriptions: [
+    ({ pending, todo }) => !pending && new UpdateTodoSubscription({ todo }),
+  ],
 });
