@@ -172,6 +172,9 @@ If you want to manually manage your subscription, the container also adds a `sub
 - [ ] Add tests ([#1])
 - [ ] Automatically add `__typename` to query for `RANGE_ADD` subscriptions ([#12])
 
+## Credits
+Big thanks to [@taion](https://github.com/taion) for cleaning up my mess, creating a really nice API and these amazing docs :tada: 
+
 [#1]: https://github.com/edvinerikson/relay-subscriptions/issues/1
 [#12]: https://github.com/edvinerikson/relay-subscriptions/issues/12
 
