@@ -1,7 +1,7 @@
 {
   "name": "relay-subscriptions",
   "version": "1.0.0",
-  "description": "Realtime utils for Relay",
+  "description": "Subscription support for Relay",
   "main": "lib/index.js",
   "scripts": {
     "build": "rimraf lib && babel src --ignore __tests__ --out-dir lib",
