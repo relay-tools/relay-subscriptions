@@ -42,6 +42,7 @@ ReactDOM.render(
     environment={environment}
     history={history}
     render={applyRouterMiddleware(useRelay)}
+    forceFetch
   >
     <Route
       path="/"
