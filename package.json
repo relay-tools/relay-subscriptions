@@ -36,7 +36,7 @@
     "warning": "^3.0.0"
   },
   "peerDependencies": {
-    "react-relay": "^0.9.1",
+    "react-relay": "^0.10.x",
     "react": "^0.14.0 || ^15.0.0"
   },
   "devDependencies": {
