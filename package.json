@@ -8,7 +8,7 @@
     "check": "flow check src",
     "lint": "eslint examples src",
     "prepublish": "npm run build",
-    "test": "npm run lint && npm run check && npm run testonly",
+    "test": "jest",
     "testonly": "jest",
     "watch": "npm run build -- --watch"
   },
