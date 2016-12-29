@@ -1,6 +1,6 @@
 {
   "name": "relay-subscriptions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Subscription support for Relay",
   "main": "lib/index.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "warning": "^3.0.0"
   },
   "peerDependencies": {
-    "react-relay": "^0.9.1",
+    "react-relay": ">=0.9.1",
     "react": "^0.14.0 || ^15.0.0"
   },
   "devDependencies": {
@@ -61,7 +61,7 @@
     "react": "^15.3.1",
     "react-addons-test-utils": "^15.3.1",
     "react-dom": "^15.3.1",
-    "react-relay": "^0.9.2",
+    "react-relay": "^0.10.0",
     "rimraf": "^2.5.4"
   },
   "jest": {
