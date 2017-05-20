@@ -1,6 +1,6 @@
 # Relay Subscriptions [![npm][npm-badge]][npm]
 
-Subscription support for [Relay](http://facebook.github.io/relay/).
+Subscription support for [Relay Classic](http://facebook.github.io/relay/).
 
 ![PoC](http://g.recordit.co/zZfGNmYJTr.gif)
 
