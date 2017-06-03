@@ -6,9 +6,10 @@ jest.mock('react-relay/lib/RelayContainer', () => ({
 }));
 
 import { mount } from 'enzyme';
+import PropTypes from 'prop-types';
 import React from 'react';
 
-import RelaySubscriptions from '../../';
+import RelaySubscriptions from '..';
 
 describe('createContainer', () => {
   it('should support relay.subscribe', () => {
@@ -19,7 +20,7 @@ describe('createContainer', () => {
 
     class Widget extends React.Component {
       static propTypes = {
-        relay: React.PropTypes.object.isRequired,
+        relay: PropTypes.object.isRequired,
       };
 
       componentDidMount() {
@@ -36,7 +37,10 @@ describe('createContainer', () => {
 
     mount(<WidgetContainer relay={{}} />, {
       context: {
-        relay: environment,
+        relay: {
+          environment,
+          variables: {},
+        },
       },
     });
     expect(environment.subscribe).toHaveBeenCalledWith(dummySubscription);

@@ -119,23 +119,25 @@ io.on('connection', socket => {
   });
 });
 
-// Serve the Relay app
+// Serve the Relay app.
 const compiler = webpack({
-  devtool: 'sourcemap',
   entry: [
     'babel-polyfill',
-    path.join(__dirname, 'js', 'app.js'),
+    './js/app.js',
   ],
+
+  output: {
+    path: '/',
+    filename: 'app.js',
+  },
+
   module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel',
-      },
+    rules: [
+      { test: /\.js$/, exclude: /node_modules/, use: 'babel-loader' },
     ],
   },
-  output: { filename: 'app.js', path: '/' },
+
+  devtool: 'sourcemap',
 });
 
 const app = new WebpackDevServer(compiler, {

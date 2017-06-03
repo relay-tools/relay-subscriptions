@@ -28,7 +28,7 @@ To use Relay Subscriptions, you need to provide a network layer with subscriptio
 A simple network layer that uses [Socket.IO](http://socket.io/) as the underlying transport looks like:
 
 ```js
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import io from 'socket.io-client';
 
 export default class NetworkLayer extends Relay.DefaultNetworkLayer {
@@ -89,7 +89,7 @@ environment.injectNetworkLayer(new NetworkLayer());
 Subclass the `Subscription` class to define subscriptions. This base class is similar to `Relay.Mutation`. A basic subscription looks like:
 
 ```js
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import { Subscription } from 'relay-subscriptions';
 
 import Widget from '../components/Widget';
@@ -142,7 +142,7 @@ For components with subscriptions, use `RelaySubscriptions.createContainer` inst
 
 ```js
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import RelaySubscriptions from 'relay-subscriptions';
 
 import WidgetSubscription from '../subscriptions/WidgetSubscription';

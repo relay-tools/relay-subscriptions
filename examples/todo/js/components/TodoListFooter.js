@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import { IndexLink, Link } from 'react-router';
 
 import RemoveCompletedTodosMutation

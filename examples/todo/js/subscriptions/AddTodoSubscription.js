@@ -1,4 +1,4 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import { Subscription } from 'relay-subscriptions';
 
 import Todo from '../components/Todo';

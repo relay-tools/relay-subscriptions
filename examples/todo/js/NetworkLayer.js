@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import io from 'socket.io-client';
 
 export default class NetworkLayer extends Relay.DefaultNetworkLayer {
