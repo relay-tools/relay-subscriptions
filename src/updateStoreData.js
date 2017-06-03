@@ -1,6 +1,6 @@
 /* @flow */
 
-import type Relay from 'react-relay';
+import type Relay from 'react-relay/classic';
 import type RelayQuery from 'react-relay/lib/RelayQuery';
 
 import type {

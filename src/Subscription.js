@@ -1,7 +1,7 @@
 /* @flow */
 
 import invariant from 'invariant';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import RelayMetaRoute from 'react-relay/lib/RelayMetaRoute';
 
 import type {

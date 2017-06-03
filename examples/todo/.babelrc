@@ -1,8 +1,10 @@
 {
   "presets": [
-    ["es2015", { "loose": true }],
-    "stage-1",
-    "react",
-    { "plugins": [ "./build/babelRelayPlugin" ] }
+    ["env", { "loose": true }],
+    "stage-2",
+    "react"
+  ],
+  "plugins": [
+    ["relay", { "schema": "data/schema.graphql" }]
   ]
 }

@@ -1,7 +1,7 @@
 /* @flow */
 
 import invariant from 'invariant';
-import Relay from 'react-relay';
+import Relay from 'react-relay/classic';
 import RelayNetworkLayer from 'react-relay/lib/RelayNetworkLayer';
 import RelayStoreData from 'react-relay/lib/RelayStoreData';
 

@@ -1,0 +1,6 @@
+{
+  "rules": {
+    // Don't fail linting if example dependencies aren't installed.
+    "import/no-unresolved": "off"
+  }
+}
