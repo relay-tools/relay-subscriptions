@@ -1,6 +1,6 @@
 {
   "name": "relay-subscriptions",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Subscription support for Relay",
   "main": "lib/index.js",
   "scripts": {
