@@ -1,7 +1,7 @@
 {
-  "name": "relay-classic-subscriptions",
-  "version": "2.0.0",
-  "description": "Subscription support for Relay/Classic",
+  "name": "relay-subscriptions",
+  "version": "2.0.1",
+  "description": "Subscription support for Relay",
   "main": "lib/index.js",
   "scripts": {
     "build": "rimraf lib && babel src --ignore __tests__ --out-dir lib",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clockwisehq/relay-classic-subscriptions.git"
+    "url": "git+https://github.com/edvinerikson/relay-subscriptions.git"
   },
   "files": [
     "lib"
@@ -28,9 +28,9 @@
   "author": "Edvin Eriksson <edvinerikson@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/clockwisehq/relay-classic-subscriptions/issues"
+    "url": "https://github.com/edvinerikson/relay-subscriptions/issues"
   },
-  "homepage": "https://github.com/clockwisehq/relay-classic-subscriptions#readme",
+  "homepage": "https://github.com/edvinerikson/relay-subscriptions#readme",
   "dependencies": {
     "invariant": "^2.2.2",
     "lodash": "^4.17.4",
