@@ -1,5 +1,7 @@
 # Relay Subscriptions [![npm][npm-badge]][npm]
 
+**NOTE: This is a fork of Edvin Erikson's excellent Relay Subscriptions. YOU PROBABLY SHOULDN'T BE USING THIS FORK**
+
 Subscription support for [Relay Classic](http://facebook.github.io/relay/).
 
 ![PoC](http://g.recordit.co/zZfGNmYJTr.gif)
