@@ -92,7 +92,7 @@ function subscribe(
     makeRelayProp(props) {
       return {
         ...props.relay,
-        subscribe: this.context.relay.environment.subscribe,
+        subscribe: this.context.relay.environment.startSubscription,
       };
     }
 
@@ -103,7 +103,7 @@ function subscribe(
 
       return {
         subscription,
-        disposable: this.context.relay.environment.subscribe(subscription),
+        disposable: this.context.relay.environment.startSubscription(subscription),
       };
     }
 

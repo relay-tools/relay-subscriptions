@@ -14,7 +14,7 @@ import RelaySubscriptions from '..';
 describe('createContainer', () => {
   it('should support relay.subscribe', () => {
     const environment = new RelaySubscriptions.Environment();
-    spyOn(environment, 'subscribe');
+    spyOn(environment, 'startSubscription');
 
     const dummySubscription = new RelaySubscriptions.Subscription();
 
@@ -43,6 +43,6 @@ describe('createContainer', () => {
         },
       },
     });
-    expect(environment.subscribe).toHaveBeenCalledWith(dummySubscription);
+    expect(environment.startSubscription).toHaveBeenCalledWith(dummySubscription);
   });
 });
