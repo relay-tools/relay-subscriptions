@@ -286,9 +286,9 @@ const GraphQLAddTodoSubscription = subscriptionWithClientId({
       resolve: () => getViewer(),
     },
   },
-  subscribe: (input, context) => {
-    context.subscribe('add_todo');
-  },
+  subscribe: (input, context) => (
+    context.subscribe('add_todo')
+  ),
 });
 
 
@@ -304,9 +304,9 @@ const GraphQLRemoveTodoSubscription = subscriptionWithClientId({
       resolve: () => getViewer(),
     },
   },
-  subscribe: (input, context) => {
-    context.subscribe('delete_todo');
-  },
+  subscribe: (input, context) => (
+    context.subscribe('delete_todo')
+  ),
 });
 
 const GraphQLUpdateTodoSubscription = subscriptionWithClientId({
@@ -324,9 +324,9 @@ const GraphQLUpdateTodoSubscription = subscriptionWithClientId({
       resolve: () => getViewer(),
     },
   },
-  subscribe: ({ id }, context) => {
-    context.subscribe(`update_todo_${fromGlobalId(id).id}`);
-  },
+  subscribe: ({ id }, context) => (
+    context.subscribe(`update_todo_${fromGlobalId(id).id}`)
+  ),
 });
 
 const Mutation = new GraphQLObjectType({
