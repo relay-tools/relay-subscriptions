@@ -14,8 +14,7 @@
 
 import express from 'express';
 import graphQLHTTP from 'express-graphql';
-import { graphql } from 'graphql';
-import { graphqlSubscribe } from 'graphql-relay-subscription';
+import { parse, subscribe } from 'graphql';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
@@ -36,85 +35,125 @@ const graphQLServer = graphQLApp.listen(GRAPHQL_PORT, () => {
   );
 });
 
+class AsyncQueue {
+  constructor(unsubscribe) {
+    this.unsubscribe = unsubscribe;
+
+    this.values = [];
+    this.createPromise();
+
+    this.iterable = this.createIterable();
+  }
+
+  createPromise() {
+    this.promise = new Promise((resolve) => {
+      this.resolvePromise = resolve;
+    });
+  }
+
+  async * createIterable() {
+    try {
+      while (true) { // eslint-disable-line no-constant-condition
+        await this.promise; // eslint-disable-line no-unused-expressions
+
+        for (const value of this.values) {
+          yield value;
+        }
+
+        this.values.length = 0;
+        this.createPromise();
+      }
+    } finally {
+      this.unsubscribe();
+    }
+  }
+
+  push(value) {
+    this.values.push(value);
+    this.resolvePromise();
+  }
+}
+
 const io = require('socket.io')(graphQLServer, {
   serveClient: false,
 });
 
 io.on('connection', socket => {
   const topics = Object.create(null);
-  const unsubscribeMap = Object.create(null);
+  const subscriptions = Object.create(null);
 
   const removeNotifier = addNotifier(({ topic, data }) => {
-    const topicListeners = topics[topic];
-    if (!topicListeners) return;
+    const topicQueues = topics[topic];
+    if (!topicQueues) {
+      return;
+    }
 
-    topicListeners.forEach(({ id, query, variables }) => {
-      graphql(
-        schema,
-        query,
-        data,
-        null,
-        variables
-      ).then((result) => {
-        socket.emit('subscription update', { id, ...result });
-      });
+    topicQueues.forEach(queue => {
+      queue.push(data);
     });
   });
 
-  socket.on('subscribe', ({ id, query, variables }) => {
-    function unsubscribe(topic, subscription) {
-      const index = topics[topic].indexOf(subscription);
-      if (index === -1) return;
+  socket.on('subscribe', async ({ id, query, variables }) => {
+    function unsubscribe(topic, queue) {
+      const topicQueues = topics[topic];
 
-      topics[topic].splice(index);
-
-      console.log(
-        'Removed subscription for topic %s. Total subscriptions for topic: %d',
-        topic,
-        topics[topic].length
-      );
-    }
-
-    function subscribe(topic) {
-      topics[topic] = topics[topic] || [];
-      const subscription = { id, query, variables };
-
-      topics[topic].push(subscription);
-
-      unsubscribeMap[id] = () => {
-        unsubscribe(topic, subscription);
-      };
-
-      console.log(
-        'New subscription for topic %s. Total subscriptions for topic: %d',
-        topic,
-        topics[topic].length
-      );
-    }
-
-    graphqlSubscribe({
-      schema,
-      query,
-      variables,
-      context: { subscribe },
-    }).then((result) => {
-      if (result.errors) {
-        console.error('Subscribe failed', result.errors);
+      const index = topicQueues.indexOf(queue);
+      if (index === -1) {
+        return;
       }
-    });
+
+      topicQueues.splice(index, 1);
+      console.log('removed subscription for %s', topic);
+    }
+
+    function createSubscription(topic) {
+      if (!topics[topic]) {
+        topics[topic] = [];
+      }
+
+      const queue = new AsyncQueue(() => {
+        unsubscribe(topic, queue);
+      });
+
+      topics[topic].push(queue);
+      console.log('added subscription for %s', topic);
+
+      return queue.iterable;
+    }
+
+    const subscription = await subscribe(
+      schema,
+      parse(query),
+      null,
+      { subscribe: createSubscription },
+      variables,
+    );
+
+    if (subscription.errors) {
+      console.error('subscribe failed', subscription.errors);
+      return;
+    }
+
+    subscriptions[id] = subscription;
+
+    for await (const result of subscription) { // eslint-disable-line semi
+      socket.emit('subscription update', { id, ...result });
+    }
   });
 
   socket.on('unsubscribe', (id) => {
-    const unsubscribe = unsubscribeMap[id];
-    if (!unsubscribe) return;
+    const subscription = subscriptions[id];
+    if (!subscription) {
+      return;
+    }
 
-    unsubscribe();
-    delete unsubscribeMap[id];
+    subscription.return();
+    delete subscriptions[id];
     socket.emit('subscription closed', id);
   });
 
   socket.on('disconnect', () => {
-    console.log('Socket disconnect');
+    console.log('socket disconnect');
     removeNotifier();
   });
 });
