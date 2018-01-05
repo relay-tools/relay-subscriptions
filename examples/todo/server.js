@@ -14,8 +14,9 @@
 
 import express from 'express';
 import graphQLHTTP from 'express-graphql';
-import { parse, subscribe } from 'graphql';
+import { execute, subscribe } from 'graphql';
 import path from 'path';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
@@ -74,89 +75,66 @@ class AsyncQueue {
   }
 }
 
-const io = require('socket.io')(graphQLServer, {
-  serveClient: false,
-});
+SubscriptionServer.create(
+  {
+    schema,
+    execute,
+    subscribe,
 
-io.on('connection', socket => {
-  const topics = Object.create(null);
-  const subscriptions = Object.create(null);
+    onConnect: (payload, socket) => {
+      const topics = Object.create(null);
 
-  const removeNotifier = addNotifier(({ topic, data }) => {
-    const topicQueues = topics[topic];
-    if (!topicQueues) {
-      return;
-    }
+      // eslint-disable-next-line no-param-reassign
+      socket.removeNotifier = addNotifier(({ topic, data }) => {
+        const topicQueues = topics[topic];
+        if (!topicQueues) {
+          return;
+        }
 
-    topicQueues.forEach(queue => {
-      queue.push(data);
-    });
-  });
-
-  socket.on('subscribe', async ({ id, query, variables }) => {
-    function unsubscribe(topic, queue) {
-      const topicQueues = topics[topic];
-
-      const index = topicQueues.indexOf(queue);
-      if (index === -1) {
-        return;
-      }
-
-      topicQueues.splice(index, 1);
-      console.log('removed subscription for %s', topic);
-    }
-
-    function createSubscription(topic) {
-      if (!topics[topic]) {
-        topics[topic] = [];
-      }
-
-      const queue = new AsyncQueue(() => {
-        unsubscribe(topic, queue);
+        topicQueues.forEach((queue) => {
+          queue.push(data);
+        });
       });
 
-      topics[topic].push(queue);
-      console.log('added subscription for %s', topic);
+      function unsubscribe(topic, queue) {
+        const topicQueues = topics[topic];
 
-      return queue.iterable;
-    }
+        const index = topicQueues.indexOf(queue);
+        if (index === -1) {
+          return;
+        }
 
-    const subscription = await subscribe(
-      schema,
-      parse(query),
-      null,
-      { subscribe: createSubscription },
-      variables,
-    );
+        topicQueues.splice(index, 1);
+        console.log('removed subscription for %s', topic);
+      }
 
-    if (subscription.errors) {
-      console.error('subscribe failed', subscription.errors);
-      return;
-    }
+      return {
+        subscribe: (topic) => {
+          if (!topics[topic]) {
+            topics[topic] = [];
+          }
 
-    subscriptions[id] = subscription;
+          const queue = new AsyncQueue(() => {
+            unsubscribe(topic, queue);
+          });
 
-    for await (const result of subscription) { // eslint-disable-line semi
-      socket.emit('subscription update', { id, ...result });
-    }
-  });
+          topics[topic].push(queue);
+          console.log('added subscription for %s', topic);
 
-  socket.on('unsubscribe', (id) => {
-    const subscription = subscriptions[id];
-    if (!subscription) {
-      return;
-    }
+          return queue.iterable;
+        },
+      };
+    },
 
-    subscription.return();
-    delete subscriptions[id];
-    socket.emit('subscription closed', id);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('socket disconnect');
-    removeNotifier();
-  });
-});
+    onDisconnect: (socket) => {
+      console.log('socket disconnect');
+      socket.removeNotifier();
+    },
+  },
+  {
+    server: graphQLServer,
+  },
+);
 
 // Serve the Relay app.
 const compiler = webpack({
@@ -182,8 +160,10 @@ const compiler = webpack({
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   proxy: {
-    '/graphql': `http://localhost:${GRAPHQL_PORT}`,
-    '/socket.io': `http://localhost:${GRAPHQL_PORT}`,
+    '/graphql': {
+      target: `http://localhost:${GRAPHQL_PORT}`,
+      ws: true,
+    },
   },
   publicPath: '/js/',
   stats: { colors: true },
