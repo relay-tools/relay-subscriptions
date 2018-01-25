@@ -35,7 +35,6 @@
     "invariant": "^2.2.2",
     "lodash": "^4.17.4",
     "prop-types": "^15.5.10",
-    "react-test-renderer": "^15.5.4",
     "warning": "^3.0.0"
   },
   "peerDependencies": {
@@ -63,6 +62,7 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-relay": "^1.0.0",
+    "react-test-renderer": "^15.5.4",
     "rimraf": "^2.6.1"
   }
 }
