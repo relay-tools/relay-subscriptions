@@ -50,7 +50,7 @@
     "babel-preset-env": "^1.5.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "enzyme": "^2.8.2",
+    "enzyme": "^3.9.0",
     "eslint": "^2.13.1",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-flowtype": "^2.34.0",
